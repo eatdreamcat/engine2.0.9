@@ -1,0 +1,13 @@
+{
+    "files.exclude": {
+        ".git": true,
+        "node_modules": false,
+        ".github": true
+    },
+    "search.exclude": {
+        ".git": true,
+        "node_modules": false,
+        ".github": true,
+        "bin": true
+    }
+}
