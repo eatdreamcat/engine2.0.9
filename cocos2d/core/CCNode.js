@@ -23,25 +23,25 @@
  THE SOFTWARE.
  ****************************************************************************/
 
-'use strict';
+"use strict";
 
-const BaseNode = require('./utils/base-node');
-const PrefabHelper = require('./utils/prefab-helper');
-const mathPools = require('./utils/math-pools');
-const math = require('./renderer/render-engine').math;
-const AffineTrans = require('./utils/affine-transform');
-const eventManager = require('./event-manager');
-const macro = require('./platform/CCMacro');
-const misc = require('./utils/misc');
-const js = require('./platform/js');
-const Event = require('./event/event');
-const EventTarget = require('./event/event-target');
-const RenderFlow = require('./renderer/render-flow');
+const BaseNode = require("./utils/base-node");
+const PrefabHelper = require("./utils/prefab-helper");
+const mathPools = require("./utils/math-pools");
+const math = require("./renderer/render-engine").math;
+const AffineTrans = require("./utils/affine-transform");
+const eventManager = require("./event-manager");
+const macro = require("./platform/CCMacro");
+const misc = require("./utils/misc");
+const js = require("./platform/js");
+const Event = require("./event/event");
+const EventTarget = require("./event/event-target");
+const RenderFlow = require("./renderer/render-flow");
 
 const Flags = cc.Object.Flags;
 const Destroying = Flags.Destroying;
 
-const ERR_INVALID_NUMBER = CC_EDITOR && 'The %s is invalid';
+const ERR_INVALID_NUMBER = CC_EDITOR && "The %s is invalid";
 const ONE_DEGREE = Math.PI / 180;
 
 var ActionManagerExist = !!cc.ActionManager;
@@ -61,11 +61,9 @@ const SIZE_ON = 1 << 3;
 const ANCHOR_ON = 1 << 4;
 const COLOR_ON = 1 << 5;
 
-
 let BuiltinGroupIndex = cc.Enum({
-    DEBUG: 31
-})
-
+    DEBUG: 31,
+});
 
 /**
  * !#en Node's local dirty properties flag
@@ -110,7 +108,7 @@ var LocalDirtyFlag = cc.Enum({
      * @property {Number} RT
      * @static
      */
-    RT: 1 << 0 | 1 << 1 | 1 << 2,
+    RT: (1 << 0) | (1 << 1) | (1 << 2),
     /**
      * !#en Flag for all dirty properties
      * !#zh 覆盖所有 dirty 状态的标记位
@@ -134,28 +132,28 @@ var EventType = cc.Enum({
      * @property {String} TOUCH_START
      * @static
      */
-    TOUCH_START: 'touchstart',
+    TOUCH_START: "touchstart",
     /**
      * !#en The event type for touch move event, you can use its value directly: 'touchmove'
      * !#zh 当手指在屏幕上移动时。
      * @property {String} TOUCH_MOVE
      * @static
      */
-    TOUCH_MOVE: 'touchmove',
+    TOUCH_MOVE: "touchmove",
     /**
      * !#en The event type for touch end event, you can use its value directly: 'touchend'
      * !#zh 当手指在目标节点区域内离开屏幕时。
      * @property {String} TOUCH_END
      * @static
      */
-    TOUCH_END: 'touchend',
+    TOUCH_END: "touchend",
     /**
      * !#en The event type for touch end event, you can use its value directly: 'touchcancel'
      * !#zh 当手指在目标节点区域外离开屏幕时。
      * @property {String} TOUCH_CANCEL
      * @static
      */
-    TOUCH_CANCEL: 'touchcancel',
+    TOUCH_CANCEL: "touchcancel",
 
     /**
      * !#en The event type for mouse down events, you can use its value directly: 'mousedown'
@@ -163,42 +161,42 @@ var EventType = cc.Enum({
      * @property {String} MOUSE_DOWN
      * @static
      */
-    MOUSE_DOWN: 'mousedown',
+    MOUSE_DOWN: "mousedown",
     /**
      * !#en The event type for mouse move events, you can use its value directly: 'mousemove'
      * !#zh 当鼠标在目标节点在目标节点区域中移动时，不论是否按下。
      * @property {String} MOUSE_MOVE
      * @static
      */
-    MOUSE_MOVE: 'mousemove',
+    MOUSE_MOVE: "mousemove",
     /**
      * !#en The event type for mouse enter target events, you can use its value directly: 'mouseenter'
      * !#zh 当鼠标移入目标节点区域时，不论是否按下。
      * @property {String} MOUSE_ENTER
      * @static
      */
-    MOUSE_ENTER: 'mouseenter',
+    MOUSE_ENTER: "mouseenter",
     /**
      * !#en The event type for mouse leave target events, you can use its value directly: 'mouseleave'
      * !#zh 当鼠标移出目标节点区域时，不论是否按下。
      * @property {String} MOUSE_LEAVE
      * @static
      */
-    MOUSE_LEAVE: 'mouseleave',
+    MOUSE_LEAVE: "mouseleave",
     /**
      * !#en The event type for mouse up events, you can use its value directly: 'mouseup'
      * !#zh 当鼠标从按下状态松开时触发一次。
      * @property {String} MOUSE_UP
      * @static
      */
-    MOUSE_UP: 'mouseup',
+    MOUSE_UP: "mouseup",
     /**
      * !#en The event type for mouse wheel events, you can use its value directly: 'mousewheel'
      * !#zh 当鼠标滚轮滚动时。
      * @property {String} MOUSE_WHEEL
      * @static
      */
-    MOUSE_WHEEL: 'mousewheel',
+    MOUSE_WHEEL: "mousewheel",
 
     /**
      * !#en The event type for position change events.
@@ -209,7 +207,7 @@ var EventType = cc.Enum({
      * @property {String} POSITION_CHANGED
      * @static
      */
-    POSITION_CHANGED: 'position-changed',
+    POSITION_CHANGED: "position-changed",
     /**
      * !#en The event type for rotation change events.
      * Performance note, this event will be triggered every time corresponding properties being changed,
@@ -219,7 +217,7 @@ var EventType = cc.Enum({
      * @property {String} ROTATION_CHANGED
      * @static
      */
-    ROTATION_CHANGED: 'rotation-changed',
+    ROTATION_CHANGED: "rotation-changed",
     /**
      * !#en The event type for scale change events.
      * Performance note, this event will be triggered every time corresponding properties being changed,
@@ -229,7 +227,7 @@ var EventType = cc.Enum({
      * @property {String} SCALE_CHANGED
      * @static
      */
-    SCALE_CHANGED: 'scale-changed',
+    SCALE_CHANGED: "scale-changed",
     /**
      * !#en The event type for size change events.
      * Performance note, this event will be triggered every time corresponding properties being changed,
@@ -239,7 +237,7 @@ var EventType = cc.Enum({
      * @property {String} SIZE_CHANGED
      * @static
      */
-    SIZE_CHANGED: 'size-changed',
+    SIZE_CHANGED: "size-changed",
     /**
      * !#en The event type for anchor point change events.
      * Performance note, this event will be triggered every time corresponding properties being changed,
@@ -249,7 +247,7 @@ var EventType = cc.Enum({
      * @property {String} ANCHOR_CHANGED
      * @static
      */
-    ANCHOR_CHANGED: 'anchor-changed',
+    ANCHOR_CHANGED: "anchor-changed",
     /**
      * !#en The event type for color change events.
      * Performance note, this event will be triggered every time corresponding properties being changed,
@@ -259,35 +257,35 @@ var EventType = cc.Enum({
      * @property {String} COLOR_CHANGED
      * @static
      */
-    COLOR_CHANGED: 'color-changed',
+    COLOR_CHANGED: "color-changed",
     /**
      * !#en The event type for new child added events.
      * !#zh 当新的子节点被添加时触发的事件。
      * @property {String} CHILD_ADDED
      * @static
      */
-    CHILD_ADDED: 'child-added',
+    CHILD_ADDED: "child-added",
     /**
      * !#en The event type for child removed events.
      * !#zh 当子节点被移除时触发的事件。
      * @property {String} CHILD_REMOVED
      * @static
      */
-    CHILD_REMOVED: 'child-removed',
+    CHILD_REMOVED: "child-removed",
     /**
      * !#en The event type for children reorder events.
      * !#zh 当子节点顺序改变时触发的事件。
      * @property {String} CHILD_REORDER
      * @static
      */
-    CHILD_REORDER: 'child-reorder',
+    CHILD_REORDER: "child-reorder",
     /**
      * !#en The event type for node group changed events.
      * !#zh 当节点归属群组发生变化时触发的事件。
      * @property {String} GROUP_CHANGED
      * @static
      */
-    GROUP_CHANGED: 'group-changed',
+    GROUP_CHANGED: "group-changed",
 });
 
 var _touchEvents = [
@@ -333,8 +331,7 @@ var _touchEndHandler = function (touch, event) {
 
     if (node._hitTest(pos, this)) {
         event.type = EventType.TOUCH_END;
-    }
-    else {
+    } else {
         event.type = EventType.TOUCH_CANCEL;
     }
     event.touch = touch;
@@ -381,14 +378,12 @@ var _mouseMoveHandler = function (event) {
         event.type = EventType.MOUSE_MOVE;
         event.bubbles = true;
         node.dispatchEvent(event);
-    }
-    else if (this._previousIn) {
+    } else if (this._previousIn) {
         event.type = EventType.MOUSE_LEAVE;
         node.dispatchEvent(event);
         this._previousIn = false;
         _currentHovered = null;
-    }
-    else {
+    } else {
         // continue dispatching
         return;
     }
@@ -419,15 +414,19 @@ var _mouseWheelHandler = function (event) {
     }
 };
 
-function _searchMaskInParent (node) {
+function _searchMaskInParent(node) {
     var Mask = cc.Mask;
     if (Mask) {
         var index = 0;
-        for (var curr = node; curr && cc.Node.isNode(curr); curr = curr._parent, ++index) {
+        for (
+            var curr = node;
+            curr && cc.Node.isNode(curr);
+            curr = curr._parent, ++index
+        ) {
             if (curr.getComponent(Mask)) {
                 return {
                     index: index,
-                    node: curr
+                    node: curr,
                 };
             }
         }
@@ -435,7 +434,7 @@ function _searchMaskInParent (node) {
     return null;
 }
 
-function _checkListeners (node, events) {
+function _checkListeners(node, events) {
     if (!(node._objFlags & Destroying)) {
         var i = 0;
         if (node._bubblingListeners) {
@@ -457,7 +456,7 @@ function _checkListeners (node, events) {
     return true;
 }
 
-function _doDispatchEvent (owner, event) {
+function _doDispatchEvent(owner, event) {
     var target, i;
     event.target = owner;
 
@@ -515,7 +514,7 @@ function _doDispatchEvent (owner, event) {
 }
 
 // traversal the node tree, child cullingMask must keep the same with the parent.
-function _getActualGroupIndex (node) {
+function _getActualGroupIndex(node) {
     let groupIndex = node.groupIndex;
     if (groupIndex === 0 && node.parent) {
         groupIndex = _getActualGroupIndex(node.parent);
@@ -523,7 +522,7 @@ function _getActualGroupIndex (node) {
     return groupIndex;
 }
 
-function _updateCullingMask (node) {
+function _updateCullingMask(node) {
     let index = _getActualGroupIndex(node);
     node._cullingMask = 1 << index;
     for (let i = 0; i < node._children.length; i++) {
@@ -542,7 +541,7 @@ function _updateCullingMask (node) {
  * @extends _BaseNode
  */
 var Node = cc.Class({
-    name: 'cc.Node',
+    name: "cc.Node",
     extends: BaseNode,
 
     properties: {
@@ -554,11 +553,11 @@ var Node = cc.Class({
         _position: cc.Vec3,
         _scaleX: {
             default: undefined,
-            type: cc.Float
+            type: cc.Float,
         },
         _scaleY: {
             default: undefined,
-            type: cc.Float
+            type: cc.Float,
         },
         _scale: cc.Vec3,
         _rotationX: 0.0,
@@ -568,13 +567,12 @@ var Node = cc.Class({
         _skewY: 0.0,
         _zIndex: {
             default: undefined,
-            type: cc.Integer
+            type: cc.Integer,
         },
         _localZOrder: {
             default: 0,
-            serializable: false
+            serializable: false,
         },
-    
 
         // internal properties
 
@@ -591,7 +589,7 @@ var Node = cc.Class({
          */
         groupIndex: {
             default: 0,
-            type: cc.Integer
+            type: cc.Integer,
         },
 
         /**
@@ -605,16 +603,24 @@ var Node = cc.Class({
          * @type {String}
          */
         group: {
-            get () {
-                return cc.game.groupList[this.groupIndex] || '';
+            get() {
+                return cc.game.groupList[this.groupIndex] || "";
             },
 
-            set (value) {
+            set(value) {
                 // update the groupIndex
                 this.groupIndex = cc.game.groupList.indexOf(value);
                 _updateCullingMask(this);
                 this.emit(EventType.GROUP_CHANGED, this);
-            }
+            },
+        },
+
+        setGroup: function () {
+            throw new Error(" you should override this function");
+        },
+
+        getGroup: function () {
+            throw new Error(" you should override this function");
         },
 
         //properties moved from base node begin
@@ -637,10 +643,10 @@ var Node = cc.Class({
          * cc.log("Node Position X: " + node.x);
          */
         x: {
-            get () {
+            get() {
                 return this._position.x;
             },
-            set (value) {
+            set(value) {
                 var localPosition = this._position;
                 if (value !== localPosition.x) {
                     if (!CC_EDITOR || isFinite(value)) {
@@ -651,20 +657,25 @@ var Node = cc.Class({
                         localPosition.x = value;
                         this.setLocalDirty(LocalDirtyFlag.POSITION);
                         this._renderFlag |= RenderFlow.FLAG_WORLD_TRANSFORM;
-                        
+
                         // fast check event
                         if (this._eventMask & POSITION_ON) {
                             // send event
                             if (CC_EDITOR) {
-                                this.emit(EventType.POSITION_CHANGED, new cc.Vec3(oldValue, localPosition.y, localPosition.z));
-                            }
-                            else {
+                                this.emit(
+                                    EventType.POSITION_CHANGED,
+                                    new cc.Vec3(
+                                        oldValue,
+                                        localPosition.y,
+                                        localPosition.z
+                                    )
+                                );
+                            } else {
                                 this.emit(EventType.POSITION_CHANGED);
                             }
                         }
-                    }
-                    else {
-                        cc.error(ERR_INVALID_NUMBER, 'new x');
+                    } else {
+                        cc.error(ERR_INVALID_NUMBER, "new x");
                     }
                 }
             },
@@ -680,10 +691,10 @@ var Node = cc.Class({
          * cc.log("Node Position Y: " + node.y);
          */
         y: {
-            get () {
+            get() {
                 return this._position.y;
             },
-            set (value) {
+            set(value) {
                 var localPosition = this._position;
                 if (value !== localPosition.y) {
                     if (!CC_EDITOR || isFinite(value)) {
@@ -699,25 +710,30 @@ var Node = cc.Class({
                         if (this._eventMask & POSITION_ON) {
                             // send event
                             if (CC_EDITOR) {
-                                this.emit(EventType.POSITION_CHANGED, new cc.Vec3(localPosition.x, oldValue, localPosition.z));
-                            }
-                            else {
+                                this.emit(
+                                    EventType.POSITION_CHANGED,
+                                    new cc.Vec3(
+                                        localPosition.x,
+                                        oldValue,
+                                        localPosition.z
+                                    )
+                                );
+                            } else {
                                 this.emit(EventType.POSITION_CHANGED);
                             }
                         }
-                    }
-                    else {
-                        cc.error(ERR_INVALID_NUMBER, 'new y');
+                    } else {
+                        cc.error(ERR_INVALID_NUMBER, "new y");
                     }
                 }
             },
         },
-        
+
         z: {
-            get () {
+            get() {
                 return this._position.z;
             },
-            set (value) {
+            set(value) {
                 var localPosition = this._position;
                 if (value !== localPosition.z) {
                     if (!CC_EDITOR || isFinite(value)) {
@@ -728,9 +744,8 @@ var Node = cc.Class({
                         if (this._eventMask & POSITION_ON) {
                             this.emit(EventType.POSITION_CHANGED);
                         }
-                    }
-                    else {
-                        cc.error(ERR_INVALID_NUMBER, 'new z');
+                    } else {
+                        cc.error(ERR_INVALID_NUMBER, "new z");
                     }
                 }
             },
@@ -746,10 +761,10 @@ var Node = cc.Class({
          * cc.log("Node Rotation: " + node.rotation);
          */
         rotation: {
-            get () {
+            get() {
                 return this._rotationX;
             },
-            set (value) {
+            set(value) {
                 if (this._rotationX !== value || this._rotationY !== value) {
                     this._rotationX = this._rotationY = value;
                     // Update quaternion from rotation
@@ -761,7 +776,7 @@ var Node = cc.Class({
                         this.emit(EventType.ROTATION_CHANGED);
                     }
                 }
-            }
+            },
         },
 
         /**
@@ -774,18 +789,22 @@ var Node = cc.Class({
          * cc.log("Node Rotation X: " + node.rotationX);
          */
         rotationX: {
-            get () {
+            get() {
                 return this._rotationX;
             },
-            set (value) {
+            set(value) {
                 if (this._rotationX !== value) {
                     this._rotationX = value;
                     // Update quaternion from rotation
                     if (this._rotationX === this._rotationY) {
                         math.quat.fromEuler(this._quat, 0, 0, -value);
-                    }
-                    else {
-                        math.quat.fromEuler(this._quat, value, this._rotationY, 0);
+                    } else {
+                        math.quat.fromEuler(
+                            this._quat,
+                            value,
+                            this._rotationY,
+                            0
+                        );
                     }
                     this.setLocalDirty(LocalDirtyFlag.ROTATION);
                     this._renderFlag |= RenderFlow.FLAG_TRANSFORM;
@@ -807,18 +826,22 @@ var Node = cc.Class({
          * cc.log("Node Rotation Y: " + node.rotationY);
          */
         rotationY: {
-            get () {
+            get() {
                 return this._rotationY;
             },
-            set (value) {
+            set(value) {
                 if (this._rotationY !== value) {
                     this._rotationY = value;
                     // Update quaternion from rotation
                     if (this._rotationX === this._rotationY) {
                         math.quat.fromEuler(this._quat, 0, 0, -value);
-                    }
-                    else {
-                        math.quat.fromEuler(this._quat, this._rotationX, value, 0);
+                    } else {
+                        math.quat.fromEuler(
+                            this._quat,
+                            this._rotationX,
+                            value,
+                            0
+                        );
                     }
                     this.setLocalDirty(LocalDirtyFlag.ROTATION);
                     this._renderFlag |= RenderFlow.FLAG_TRANSFORM;
@@ -849,10 +872,10 @@ var Node = cc.Class({
          * cc.log("Node Scale X: " + node.scaleX);
          */
         scaleX: {
-            get () {
+            get() {
                 return this._scale.x;
             },
-            set (value) {
+            set(value) {
                 if (this._scale.x !== value) {
                     this._scale.x = value;
                     this.setLocalDirty(LocalDirtyFlag.SCALE);
@@ -875,10 +898,10 @@ var Node = cc.Class({
          * cc.log("Node Scale Y: " + node.scaleY);
          */
         scaleY: {
-            get () {
+            get() {
                 return this._scale.y;
             },
-            set (value) {
+            set(value) {
                 if (this._scale.y !== value) {
                     this._scale.y = value;
                     this.setLocalDirty(LocalDirtyFlag.SCALE);
@@ -901,14 +924,14 @@ var Node = cc.Class({
          * cc.log("Node SkewX: " + node.skewX);
          */
         skewX: {
-            get () {
+            get() {
                 return this._skewX;
             },
-            set (value) {
+            set(value) {
                 this._skewX = value;
                 this.setLocalDirty(LocalDirtyFlag.SKEW);
                 this._renderFlag |= RenderFlow.FLAG_TRANSFORM;
-            }
+            },
         },
 
         /**
@@ -921,14 +944,14 @@ var Node = cc.Class({
          * cc.log("Node SkewY: " + node.skewY);
          */
         skewY: {
-            get () {
+            get() {
                 return this._skewY;
             },
-            set (value) {
+            set(value) {
                 this._skewY = value;
                 this.setLocalDirty(LocalDirtyFlag.SKEW);
                 this._renderFlag |= RenderFlow.FLAG_TRANSFORM;
-            }
+            },
         },
 
         /**
@@ -940,16 +963,17 @@ var Node = cc.Class({
          * node.opacity = 255;
          */
         opacity: {
-            get () {
+            get() {
                 return this._opacity;
             },
-            set (value) {
+            set(value) {
                 if (this._opacity !== value) {
                     this._opacity = value;
-                    this._renderFlag |= RenderFlow.FLAG_OPACITY | RenderFlow.FLAG_COLOR;
+                    this._renderFlag |=
+                        RenderFlow.FLAG_OPACITY | RenderFlow.FLAG_COLOR;
                 }
             },
-            range: [0, 255]
+            range: [0, 255],
         },
 
         /**
@@ -961,16 +985,16 @@ var Node = cc.Class({
          * node.color = new cc.Color(255, 255, 255);
          */
         color: {
-            get () {
-                return this._color.clone()
+            get() {
+                return this._color.clone();
             },
-            set (value) {
+            set(value) {
                 if (!this._color.equals(value)) {
                     this._color.set(value);
                     if (CC_DEV && value.a !== 255) {
                         cc.warnID(1626);
                     }
-                    
+
                     if (this._renderComponent) {
                         this._renderFlag |= RenderFlow.FLAG_COLOR;
                     }
@@ -991,10 +1015,10 @@ var Node = cc.Class({
          * node.anchorX = 0;
          */
         anchorX: {
-            get () {
+            get() {
                 return this._anchorPoint.x;
             },
-            set (value) {
+            set(value) {
                 var anchorPoint = this._anchorPoint;
                 if (anchorPoint.x !== value) {
                     anchorPoint.x = value;
@@ -1014,10 +1038,10 @@ var Node = cc.Class({
          * node.anchorY = 0;
          */
         anchorY: {
-            get () {
+            get() {
                 return this._anchorPoint.y;
             },
-            set (value) {
+            set(value) {
                 var anchorPoint = this._anchorPoint;
                 if (anchorPoint.y !== value) {
                     anchorPoint.y = value;
@@ -1037,20 +1061,22 @@ var Node = cc.Class({
          * node.width = 100;
          */
         width: {
-            get () {
+            get() {
                 return this._contentSize.width;
             },
-            set (value) {
+            set(value) {
                 if (value !== this._contentSize.width) {
                     if (CC_EDITOR) {
-                        var clone = cc.size(this._contentSize.width, this._contentSize.height);
+                        var clone = cc.size(
+                            this._contentSize.width,
+                            this._contentSize.height
+                        );
                     }
                     this._contentSize.width = value;
                     if (this._eventMask & SIZE_ON) {
                         if (CC_EDITOR) {
                             this.emit(EventType.SIZE_CHANGED, clone);
-                        }
-                        else {
+                        } else {
                             this.emit(EventType.SIZE_CHANGED);
                         }
                     }
@@ -1067,20 +1093,22 @@ var Node = cc.Class({
          * node.height = 100;
          */
         height: {
-            get () {
+            get() {
                 return this._contentSize.height;
             },
-            set (value) {
+            set(value) {
                 if (value !== this._contentSize.height) {
                     if (CC_EDITOR) {
-                        var clone = cc.size(this._contentSize.width, this._contentSize.height);
+                        var clone = cc.size(
+                            this._contentSize.width,
+                            this._contentSize.height
+                        );
                     }
                     this._contentSize.height = value;
                     if (this._eventMask & SIZE_ON) {
                         if (CC_EDITOR) {
                             this.emit(EventType.SIZE_CHANGED, clone);
-                        }
-                        else {
+                        } else {
                             this.emit(EventType.SIZE_CHANGED);
                         }
                     }
@@ -1106,27 +1134,27 @@ var Node = cc.Class({
          * cc.log("Node zIndex: " + node.zIndex);
          */
         zIndex: {
-            get () {
+            get() {
                 return this._localZOrder >> 16;
             },
-            set (value) {
+            set(value) {
                 if (value > macro.MAX_ZINDEX) {
                     cc.warnID(1636);
                     value = macro.MAX_ZINDEX;
-                }
-                else if (value < macro.MIN_ZINDEX) {
+                } else if (value < macro.MIN_ZINDEX) {
                     cc.warnID(1637);
                     value = macro.MIN_ZINDEX;
                 }
 
                 if (this.zIndex !== value) {
-                    this._localZOrder = (this._localZOrder & 0x0000ffff) | (value << 16);
+                    this._localZOrder =
+                        (this._localZOrder & 0x0000ffff) | (value << 16);
 
                     if (this._parent) {
                         this._onSiblingIndexChanged();
                     }
                 }
-            }
+            },
         },
     },
 
@@ -1134,7 +1162,7 @@ var Node = cc.Class({
      * @method constructor
      * @param {String} [name]
      */
-    ctor () {
+    ctor() {
         this._reorderChildDirty = false;
 
         // cache component
@@ -1168,20 +1196,25 @@ var Node = cc.Class({
         EventType,
         _LocalDirtyFlag: LocalDirtyFlag,
         // is node but not scene
-        isNode (obj) {
-            return obj instanceof Node && (obj.constructor === Node || !(obj instanceof cc.Scene));
+        isNode(obj) {
+            return (
+                obj instanceof Node &&
+                (obj.constructor === Node || !(obj instanceof cc.Scene))
+            );
         },
 
-        BuiltinGroupIndex
+        BuiltinGroupIndex,
     },
 
     // OVERRIDES
 
-    _onSiblingIndexChanged () {
+    _onSiblingIndexChanged() {
         // update rendering scene graph, sort them by arrivalOrder
         var parent = this._parent;
         var siblings = parent._children;
-        var i = 0, len = siblings.length, sibling;
+        var i = 0,
+            len = siblings.length,
+            sibling;
         for (; i < len; i++) {
             sibling = siblings[i];
             sibling._updateOrderOfArrival();
@@ -1190,7 +1223,7 @@ var Node = cc.Class({
         parent._delaySort();
     },
 
-    _onPreDestroy () {
+    _onPreDestroy() {
         var destroyByParent = this._onPreDestroyBase();
 
         // Actions
@@ -1224,7 +1257,11 @@ var Node = cc.Class({
         this._matrix = this._worldMatrix = null;
 
         if (this._reorderChildDirty) {
-            cc.director.__fastOff(cc.Director.EVENT_AFTER_UPDATE, this.sortAllChildren, this);
+            cc.director.__fastOff(
+                cc.Director.EVENT_AFTER_UPDATE,
+                this.sortAllChildren,
+                this
+            );
         }
 
         if (!destroyByParent) {
@@ -1236,8 +1273,10 @@ var Node = cc.Class({
         }
     },
 
-    _onPostActivated (active) {
-        var actionManager = ActionManagerExist ? cc.director.getActionManager() : null;
+    _onPostActivated(active) {
+        var actionManager = ActionManagerExist
+            ? cc.director.getActionManager()
+            : null;
         if (active) {
             // Refresh transform
             this._renderFlag |= RenderFlow.FLAG_WORLD_TRANSFORM;
@@ -1245,23 +1284,23 @@ var Node = cc.Class({
             actionManager && actionManager.resumeTarget(this);
             eventManager.resumeTarget(this);
             if (this._touchListener) {
-                var mask = this._touchListener.mask = _searchMaskInParent(this);
+                var mask = (this._touchListener.mask = _searchMaskInParent(
+                    this
+                ));
                 if (this._mouseListener) {
                     this._mouseListener.mask = mask;
                 }
-            }
-            else if (this._mouseListener) {
+            } else if (this._mouseListener) {
                 this._mouseListener.mask = _searchMaskInParent(this);
             }
-        }
-        else {
+        } else {
             // deactivate
             actionManager && actionManager.pauseTarget(this);
             eventManager.pauseTarget(this);
         }
     },
 
-    _onHierarchyChanged (oldParent) {
+    _onHierarchyChanged(oldParent) {
         this._updateOrderOfArrival();
         _updateCullingMask(this);
         if (this._parent) {
@@ -1276,7 +1315,7 @@ var Node = cc.Class({
 
     // INTERNAL
 
-    _upgrade_1x_to_2x () {
+    _upgrade_1x_to_2x() {
         // Upgrade scaleX, scaleY from v1.x
         // TODO: remove in future version, 3.0 ?
         if (this._scaleX !== undefined) {
@@ -1298,9 +1337,13 @@ var Node = cc.Class({
         if (this._rotationX !== 0 || this._rotationY !== 0) {
             if (this._rotationX === this._rotationY) {
                 math.quat.fromEuler(this._quat, 0, 0, -this._rotationX);
-            }
-            else {
-                math.quat.fromEuler(this._quat, this._rotationX, this._rotationY, 0);
+            } else {
+                math.quat.fromEuler(
+                    this._quat,
+                    this._rotationX,
+                    this._rotationY,
+                    0
+                );
             }
         }
         // Update rotation from quaternion
@@ -1309,8 +1352,7 @@ var Node = cc.Class({
             let roty = this._quat.getPitch();
             if (rotx === 0 && roty === 0) {
                 this._rotationX = this._rotationY = -this._quat.getYaw();
-            }
-            else {
+            } else {
                 this._rotationX = rotx;
                 this._rotationY = roty;
             }
@@ -1327,7 +1369,7 @@ var Node = cc.Class({
     /*
      * The initializer for Node which will be called before all components onLoad
      */
-    _onBatchCreated () {
+    _onBatchCreated() {
         this._upgrade_1x_to_2x();
 
         this._updateOrderOfArrival();
@@ -1339,7 +1381,7 @@ var Node = cc.Class({
         if (prefabInfo && prefabInfo.sync && prefabInfo.root === this) {
             if (CC_DEV) {
                 // TODO - remove all usage of _synced
-                cc.assert(!prefabInfo._synced, 'prefab should not synced');
+                cc.assert(!prefabInfo._synced, "prefab should not synced");
             }
             PrefabHelper.syncWithPrefab(this);
         }
@@ -1363,7 +1405,7 @@ var Node = cc.Class({
     },
 
     // the same as _onBatchCreated but untouch prefab
-    _onBatchRestored () {
+    _onBatchRestored() {
         this._upgrade_1x_to_2x();
 
         this._cullingMask = 1 << _getActualGroupIndex(this);
@@ -1388,7 +1430,7 @@ var Node = cc.Class({
 
     // EVENT TARGET
 
-    _checknSetupSysEvent (type) {
+    _checknSetupSysEvent(type) {
         let newAdded = false;
         let forDispatch = false;
         if (_touchEvents.indexOf(type) !== -1) {
@@ -1401,14 +1443,13 @@ var Node = cc.Class({
                     onTouchBegan: _touchStartHandler,
                     onTouchMoved: _touchMoveHandler,
                     onTouchEnded: _touchEndHandler,
-                    onTouchCancelled: _touchCancelHandler
+                    onTouchCancelled: _touchCancelHandler,
                 });
                 eventManager.addListener(this._touchListener, this);
                 newAdded = true;
             }
             forDispatch = true;
-        }
-        else if (_mouseEvents.indexOf(type) !== -1) {
+        } else if (_mouseEvents.indexOf(type) !== -1) {
             if (!this._mouseListener) {
                 this._mouseListener = cc.EventListener.create({
                     event: cc.EventListener.MOUSE,
@@ -1426,11 +1467,18 @@ var Node = cc.Class({
             forDispatch = true;
         }
         if (newAdded && !this._activeInHierarchy) {
-            cc.director.getScheduler().schedule(function () {
-                if (!this._activeInHierarchy) {
-                    eventManager.pauseTarget(this);
-                }
-            }, this, 0, 0, 0, false);
+            cc.director.getScheduler().schedule(
+                function () {
+                    if (!this._activeInHierarchy) {
+                        eventManager.pauseTarget(this);
+                    }
+                },
+                this,
+                0,
+                0,
+                0,
+                false
+            );
         }
         return forDispatch;
     },
@@ -1481,31 +1529,30 @@ var Node = cc.Class({
      * node.on(cc.Node.EventType.ANCHOR_CHANGED, callback);
      * node.on(cc.Node.EventType.COLOR_CHANGED, callback);
      */
-    on (type, callback, target, useCapture) {
+    on(type, callback, target, useCapture) {
         let forDispatch = this._checknSetupSysEvent(type);
         if (forDispatch) {
             return this._onDispatch(type, callback, target, useCapture);
-        }
-        else {
+        } else {
             switch (type) {
                 case EventType.POSITION_CHANGED:
-                this._eventMask |= POSITION_ON;
-                break;
+                    this._eventMask |= POSITION_ON;
+                    break;
                 case EventType.SCALE_CHANGED:
-                this._eventMask |= SCALE_ON;
-                break;
+                    this._eventMask |= SCALE_ON;
+                    break;
                 case EventType.ROTATION_CHANGED:
-                this._eventMask |= ROTATION_ON;
-                break;
+                    this._eventMask |= ROTATION_ON;
+                    break;
                 case EventType.SIZE_CHANGED:
-                this._eventMask |= SIZE_ON;
-                break;
+                    this._eventMask |= SIZE_ON;
+                    break;
                 case EventType.ANCHOR_CHANGED:
-                this._eventMask |= ANCHOR_ON;
-                break;
+                    this._eventMask |= ANCHOR_ON;
+                    break;
                 case EventType.COLOR_CHANGED:
-                this._eventMask |= COLOR_ON;
-                break;
+                    this._eventMask |= COLOR_ON;
+                    break;
             }
             if (!this._bubblingListeners) {
                 this._bubblingListeners = new EventTarget();
@@ -1536,19 +1583,24 @@ var Node = cc.Class({
      * @example
      * node.once(cc.Node.EventType.ANCHOR_CHANGED, callback);
      */
-    once (type, callback, target, useCapture) {
+    once(type, callback, target, useCapture) {
         let forDispatch = this._checknSetupSysEvent(type);
-        let eventType_hasOnceListener = '__ONCE_FLAG:' + type;
+        let eventType_hasOnceListener = "__ONCE_FLAG:" + type;
 
         let listeners = null;
         if (forDispatch && useCapture) {
-            listeners = this._capturingListeners = this._capturingListeners || new EventTarget();
-        }
-        else {
-            listeners = this._bubblingListeners = this._bubblingListeners || new EventTarget();
+            listeners = this._capturingListeners =
+                this._capturingListeners || new EventTarget();
+        } else {
+            listeners = this._bubblingListeners =
+                this._bubblingListeners || new EventTarget();
         }
 
-        let hasOnceListener = listeners.hasEventListener(eventType_hasOnceListener, callback, target);
+        let hasOnceListener = listeners.hasEventListener(
+            eventType_hasOnceListener,
+            callback,
+            target
+        );
         if (!hasOnceListener) {
             let self = this;
             let onceWrapper = function (arg1, arg2, arg3, arg4, arg5) {
@@ -1561,13 +1613,12 @@ var Node = cc.Class({
         }
     },
 
-    _onDispatch (type, callback, target, useCapture) {
+    _onDispatch(type, callback, target, useCapture) {
         // Accept also patameters like: (type, callback, useCapture)
-        if (typeof target === 'boolean') {
+        if (typeof target === "boolean") {
             useCapture = target;
             target = undefined;
-        }
-        else useCapture = !!useCapture;
+        } else useCapture = !!useCapture;
         if (!callback) {
             cc.errorID(6800);
             return;
@@ -1575,13 +1626,14 @@ var Node = cc.Class({
 
         var listeners = null;
         if (useCapture) {
-            listeners = this._capturingListeners = this._capturingListeners || new EventTarget();
-        }
-        else {
-            listeners = this._bubblingListeners = this._bubblingListeners || new EventTarget();
+            listeners = this._capturingListeners =
+                this._capturingListeners || new EventTarget();
+        } else {
+            listeners = this._bubblingListeners =
+                this._bubblingListeners || new EventTarget();
         }
 
-        if ( !listeners.hasEventListener(type, callback, target) ) {
+        if (!listeners.hasEventListener(type, callback, target)) {
             listeners.add(type, callback, target);
 
             if (target && target.__eventTargets)
@@ -1606,26 +1658,30 @@ var Node = cc.Class({
      * node.off(cc.Node.EventType.TOUCH_START, callback, this.node);
      * node.off(cc.Node.EventType.ANCHOR_CHANGED, callback, this);
      */
-    off (type, callback, target, useCapture) {
+    off(type, callback, target, useCapture) {
         let touchEvent = _touchEvents.indexOf(type) !== -1;
         let mouseEvent = !touchEvent && _mouseEvents.indexOf(type) !== -1;
         if (touchEvent || mouseEvent) {
             this._offDispatch(type, callback, target, useCapture);
 
             if (touchEvent) {
-                if (this._touchListener && !_checkListeners(this, _touchEvents)) {
+                if (
+                    this._touchListener &&
+                    !_checkListeners(this, _touchEvents)
+                ) {
                     eventManager.removeListener(this._touchListener);
                     this._touchListener = null;
                 }
-            }
-            else if (mouseEvent) {
-                if (this._mouseListener && !_checkListeners(this, _mouseEvents)) {
+            } else if (mouseEvent) {
+                if (
+                    this._mouseListener &&
+                    !_checkListeners(this, _mouseEvents)
+                ) {
                     eventManager.removeListener(this._mouseListener);
                     this._mouseListener = null;
                 }
             }
-        }
-        else if (this._bubblingListeners) {
+        } else if (this._bubblingListeners) {
             this._bubblingListeners.off(type, callback, target);
 
             var hasListeners = this._bubblingListeners.hasEventListener(type);
@@ -1633,41 +1689,42 @@ var Node = cc.Class({
             if (!hasListeners) {
                 switch (type) {
                     case EventType.POSITION_CHANGED:
-                    this._eventMask &= ~POSITION_ON;
-                    break;
+                        this._eventMask &= ~POSITION_ON;
+                        break;
                     case EventType.SCALE_CHANGED:
-                    this._eventMask &= ~SCALE_ON;
-                    break;
+                        this._eventMask &= ~SCALE_ON;
+                        break;
                     case EventType.ROTATION_CHANGED:
-                    this._eventMask &= ~ROTATION_ON;
-                    break;
+                        this._eventMask &= ~ROTATION_ON;
+                        break;
                     case EventType.SIZE_CHANGED:
-                    this._eventMask &= ~SIZE_ON;
-                    break;
+                        this._eventMask &= ~SIZE_ON;
+                        break;
                     case EventType.ANCHOR_CHANGED:
-                    this._eventMask &= ~ANCHOR_ON;
-                    break;
+                        this._eventMask &= ~ANCHOR_ON;
+                        break;
                     case EventType.COLOR_CHANGED:
-                    this._eventMask &= ~COLOR_ON;
-                    break;
+                        this._eventMask &= ~COLOR_ON;
+                        break;
                 }
             }
         }
     },
 
-    _offDispatch (type, callback, target, useCapture) {
+    _offDispatch(type, callback, target, useCapture) {
         // Accept also patameters like: (type, callback, useCapture)
-        if (typeof target === 'boolean') {
+        if (typeof target === "boolean") {
             useCapture = target;
             target = undefined;
-        }
-        else useCapture = !!useCapture;
+        } else useCapture = !!useCapture;
         if (!callback) {
-            this._capturingListeners && this._capturingListeners.removeAll(type);
+            this._capturingListeners &&
+                this._capturingListeners.removeAll(type);
             this._bubblingListeners && this._bubblingListeners.removeAll(type);
-        }
-        else {
-            var listeners = useCapture ? this._capturingListeners : this._bubblingListeners;
+        } else {
+            var listeners = useCapture
+                ? this._capturingListeners
+                : this._bubblingListeners;
             if (listeners) {
                 listeners.remove(type, callback, target);
 
@@ -1675,7 +1732,6 @@ var Node = cc.Class({
                     js.array.fastRemove(target.__eventTargets, this);
                 }
             }
-
         }
     },
 
@@ -1687,28 +1743,46 @@ var Node = cc.Class({
      * @example
      * node.targetOff(target);
      */
-    targetOff (target) {
+    targetOff(target) {
         let listeners = this._bubblingListeners;
         if (listeners) {
             listeners.targetOff(target);
 
             // Check for event mask reset
-            if ((this._eventMask & POSITION_ON) && !listeners.hasEventListener(EventType.POSITION_CHANGED)) {
+            if (
+                this._eventMask & POSITION_ON &&
+                !listeners.hasEventListener(EventType.POSITION_CHANGED)
+            ) {
                 this._eventMask &= ~POSITION_ON;
             }
-            if ((this._eventMask & SCALE_ON) && !listeners.hasEventListener(EventType.SCALE_CHANGED)) {
+            if (
+                this._eventMask & SCALE_ON &&
+                !listeners.hasEventListener(EventType.SCALE_CHANGED)
+            ) {
                 this._eventMask &= ~SCALE_ON;
             }
-            if ((this._eventMask & ROTATION_ON) && !listeners.hasEventListener(EventType.ROTATION_CHANGED)) {
+            if (
+                this._eventMask & ROTATION_ON &&
+                !listeners.hasEventListener(EventType.ROTATION_CHANGED)
+            ) {
                 this._eventMask &= ~ROTATION_ON;
             }
-            if ((this._eventMask & SIZE_ON) && !listeners.hasEventListener(EventType.SIZE_CHANGED)) {
+            if (
+                this._eventMask & SIZE_ON &&
+                !listeners.hasEventListener(EventType.SIZE_CHANGED)
+            ) {
                 this._eventMask &= ~SIZE_ON;
             }
-            if ((this._eventMask & ANCHOR_ON) && !listeners.hasEventListener(EventType.ANCHOR_CHANGED)) {
+            if (
+                this._eventMask & ANCHOR_ON &&
+                !listeners.hasEventListener(EventType.ANCHOR_CHANGED)
+            ) {
                 this._eventMask &= ~ANCHOR_ON;
             }
-            if ((this._eventMask & COLOR_ON) && !listeners.hasEventListener(EventType.COLOR_CHANGED)) {
+            if (
+                this._eventMask & COLOR_ON &&
+                !listeners.hasEventListener(EventType.COLOR_CHANGED)
+            ) {
                 this._eventMask &= ~COLOR_ON;
             }
         }
@@ -1733,7 +1807,7 @@ var Node = cc.Class({
      * @param {String} type - The type of event.
      * @return {Boolean} True if a callback of the specified type is registered; false otherwise.
      */
-    hasEventListener (type) {
+    hasEventListener(type) {
         let has = false;
         if (this._bubblingListeners) {
             has = this._bubblingListeners.hasEventListener(type);
@@ -1758,11 +1832,11 @@ var Node = cc.Class({
      * @param {*} [arg4] - Fourth argument in callback
      * @param {*} [arg5] - Fifth argument in callback
      * @example
-     * 
+     *
      * eventTarget.emit('fire', event);
      * eventTarget.emit('fire', message, emitter);
      */
-    emit (type, arg1, arg2, arg3, arg4, arg5) {
+    emit(type, arg1, arg2, arg3, arg4, arg5) {
         if (this._bubblingListeners) {
             this._bubblingListeners.emit(type, arg1, arg2, arg3, arg4, arg5);
         }
@@ -1777,7 +1851,7 @@ var Node = cc.Class({
      * @method dispatchEvent
      * @param {Event} event - The Event object that is dispatched into the event flow
      */
-    dispatchEvent (event) {
+    dispatchEvent(event) {
         _doDispatchEvent(this, event);
         _cachedArray.length = 0;
     },
@@ -1794,7 +1868,7 @@ var Node = cc.Class({
      * @example
      * node.pauseSystemEvents(true);
      */
-    pauseSystemEvents (recursive) {
+    pauseSystemEvents(recursive) {
         eventManager.pauseTarget(this, recursive);
     },
 
@@ -1810,21 +1884,20 @@ var Node = cc.Class({
      * @example
      * node.resumeSystemEvents(true);
      */
-    resumeSystemEvents (recursive) {
+    resumeSystemEvents(recursive) {
         eventManager.resumeTarget(this, recursive);
     },
 
-    _hitTest (point, listener) {
+    _hitTest(point, listener) {
         let w = this._contentSize.width,
             h = this._contentSize.height,
             cameraPt = _vec2a,
             testPt = _vec2b;
-        
+
         let camera = cc.Camera.findCamera(this);
         if (camera) {
             camera.getCameraToWorldPoint(point, cameraPt);
-        }
-        else {
+        } else {
             cameraPt.set(point);
         }
 
@@ -1838,24 +1911,27 @@ var Node = cc.Class({
             if (listener && listener.mask) {
                 var mask = listener.mask;
                 var parent = this;
-                for (var i = 0; parent && i < mask.index; ++i, parent = parent.parent) {
-                }
+                for (
+                    var i = 0;
+                    parent && i < mask.index;
+                    ++i, parent = parent.parent
+                ) {}
                 // find mask parent, should hit test it
                 if (parent === mask.node) {
                     var comp = parent.getComponent(cc.Mask);
-                    return (comp && comp.enabledInHierarchy) ? comp._hitTest(cameraPt) : true;
+                    return comp && comp.enabledInHierarchy
+                        ? comp._hitTest(cameraPt)
+                        : true;
                 }
                 // mask parent no longer exists
                 else {
                     listener.mask = null;
                     return true;
                 }
-            }
-            else {
+            } else {
                 return true;
             }
-        }
-        else {
+        } else {
             return false;
         }
     },
@@ -1872,10 +1948,13 @@ var Node = cc.Class({
      * @param {Array} array - the array to receive targets
      * @example {@link cocos2d/core/event/_getCapturingTargets.js}
      */
-    _getCapturingTargets (type, array) {
+    _getCapturingTargets(type, array) {
         var parent = this.parent;
         while (parent) {
-            if (parent._capturingListeners && parent._capturingListeners.hasEventListener(type)) {
+            if (
+                parent._capturingListeners &&
+                parent._capturingListeners.hasEventListener(type)
+            ) {
                 array.push(parent);
             }
             parent = parent.parent;
@@ -1893,17 +1972,20 @@ var Node = cc.Class({
      * @param {String} type - the event type
      * @param {Array} array - the array to receive targets
      */
-    _getBubblingTargets (type, array) {
+    _getBubblingTargets(type, array) {
         var parent = this.parent;
         while (parent) {
-            if (parent._bubblingListeners && parent._bubblingListeners.hasEventListener(type)) {
+            if (
+                parent._bubblingListeners &&
+                parent._bubblingListeners.hasEventListener(type)
+            ) {
                 array.push(parent);
             }
             parent = parent.parent;
         }
     },
 
-// ACTIONS
+    // ACTIONS
     /**
      * !#en
      * Executes an action, and returns the action that is executed.<br/>
@@ -1924,14 +2006,15 @@ var Node = cc.Class({
      * node.runAction(action).repeatForever(); // fail
      * node.runAction(action.repeatForever()); // right
      */
-    runAction: ActionManagerExist ? function (action) {
-        if (!this.active)
-            return;
-        cc.assertID(action, 1618);
+    runAction: ActionManagerExist
+        ? function (action) {
+              if (!this.active) return;
+              cc.assertID(action, 1618);
 
-        cc.director.getActionManager().addAction(action, this, false);
-        return action;
-    } : emptyFunc,
+              cc.director.getActionManager().addAction(action, this, false);
+              return action;
+          }
+        : emptyFunc,
 
     /**
      * !#en Pause all actions running on the current node. Equals to `cc.director.getActionManager().pauseTarget(node)`.
@@ -1940,9 +2023,11 @@ var Node = cc.Class({
      * @example
      * node.pauseAllActions();
      */
-    pauseAllActions: ActionManagerExist ? function () {
-        cc.director.getActionManager().pauseTarget(this);
-    } : emptyFunc,
+    pauseAllActions: ActionManagerExist
+        ? function () {
+              cc.director.getActionManager().pauseTarget(this);
+          }
+        : emptyFunc,
 
     /**
      * !#en Resume all paused actions on the current node. Equals to `cc.director.getActionManager().resumeTarget(node)`.
@@ -1951,9 +2036,11 @@ var Node = cc.Class({
      * @example
      * node.resumeAllActions();
      */
-    resumeAllActions: ActionManagerExist ? function () {
-        cc.director.getActionManager().resumeTarget(this);
-    } : emptyFunc,
+    resumeAllActions: ActionManagerExist
+        ? function () {
+              cc.director.getActionManager().resumeTarget(this);
+          }
+        : emptyFunc,
 
     /**
      * !#en Stops and removes all actions from the running action list .
@@ -1962,9 +2049,11 @@ var Node = cc.Class({
      * @example
      * node.stopAllActions();
      */
-    stopAllActions: ActionManagerExist ? function () {
-        cc.director.getActionManager().removeAllActionsFromTarget(this);
-    } : emptyFunc,
+    stopAllActions: ActionManagerExist
+        ? function () {
+              cc.director.getActionManager().removeAllActionsFromTarget(this);
+          }
+        : emptyFunc,
 
     /**
      * !#en Stops and removes an action from the running action list.
@@ -1975,9 +2064,11 @@ var Node = cc.Class({
      * var action = cc.scaleTo(0.2, 1, 0.6);
      * node.stopAction(action);
      */
-    stopAction: ActionManagerExist ? function (action) {
-        cc.director.getActionManager().removeAction(action);
-    } : emptyFunc,
+    stopAction: ActionManagerExist
+        ? function (action) {
+              cc.director.getActionManager().removeAction(action);
+          }
+        : emptyFunc,
 
     /**
      * !#en Removes an action from the running action list by its tag.
@@ -1987,13 +2078,15 @@ var Node = cc.Class({
      * @example
      * node.stopAction(1);
      */
-    stopActionByTag: ActionManagerExist ? function (tag) {
-        if (tag === cc.Action.TAG_INVALID) {
-            cc.logID(1612);
-            return;
-        }
-        cc.director.getActionManager().removeActionByTag(tag, this);
-    } : emptyFunc,
+    stopActionByTag: ActionManagerExist
+        ? function (tag) {
+              if (tag === cc.Action.TAG_INVALID) {
+                  cc.logID(1612);
+                  return;
+              }
+              cc.director.getActionManager().removeActionByTag(tag, this);
+          }
+        : emptyFunc,
 
     /**
      * !#en Returns an action from the running action list by its tag.
@@ -2005,15 +2098,17 @@ var Node = cc.Class({
      * @example
      * var action = node.getActionByTag(1);
      */
-    getActionByTag: ActionManagerExist ? function (tag) {
-        if (tag === cc.Action.TAG_INVALID) {
-            cc.logID(1613);
-            return null;
-        }
-        return cc.director.getActionManager().getActionByTag(tag, this);
-    } : function () {
-        return null;
-    },
+    getActionByTag: ActionManagerExist
+        ? function (tag) {
+              if (tag === cc.Action.TAG_INVALID) {
+                  cc.logID(1613);
+                  return null;
+              }
+              return cc.director.getActionManager().getActionByTag(tag, this);
+          }
+        : function () {
+              return null;
+          },
 
     /**
      * !#en
@@ -2033,14 +2128,17 @@ var Node = cc.Class({
      * var count = node.getNumberOfRunningActions();
      * cc.log("Running Action Count: " + count);
      */
-    getNumberOfRunningActions: ActionManagerExist ? function () {
-        return cc.director.getActionManager().getNumberOfRunningActionsInTarget(this);
-    } : function () {
-        return 0;
-    },
+    getNumberOfRunningActions: ActionManagerExist
+        ? function () {
+              return cc.director
+                  .getActionManager()
+                  .getNumberOfRunningActionsInTarget(this);
+          }
+        : function () {
+              return 0;
+          },
 
-
-// TRANSFORM RELATED
+    // TRANSFORM RELATED
     /**
      * !#en Returns a copy of the position (x, y) of the node in its parent's coordinates.
      * !#zh 获取节点在父节点坐标系中的位置（x, y）。
@@ -2049,7 +2147,7 @@ var Node = cc.Class({
      * @example
      * cc.log("Node Position: " + node.getPosition());
      */
-    getPosition () {
+    getPosition() {
         return new cc.Vec2(this._position);
     },
 
@@ -2068,13 +2166,12 @@ var Node = cc.Class({
      * @param {Number} [y] - Y coordinate for position
      * @example {@link cocos2d/core/utils/base-node/setPosition.js}
      */
-    setPosition (newPosOrX, y) {
+    setPosition(newPosOrX, y) {
         var x;
         if (y === undefined) {
             x = newPosOrX.x;
             y = newPosOrX.y;
-        }
-        else {
+        } else {
             x = newPosOrX;
         }
 
@@ -2088,15 +2185,13 @@ var Node = cc.Class({
         }
         if (!CC_EDITOR || isFinite(x)) {
             locPosition.x = x;
-        }
-        else {
-            return cc.error(ERR_INVALID_NUMBER, 'x of new position');
+        } else {
+            return cc.error(ERR_INVALID_NUMBER, "x of new position");
         }
         if (!CC_EDITOR || isFinite(y)) {
             locPosition.y = y;
-        }
-        else {	
-            return cc.error(ERR_INVALID_NUMBER, 'y of new position');
+        } else {
+            return cc.error(ERR_INVALID_NUMBER, "y of new position");
         }
         this.setLocalDirty(LocalDirtyFlag.POSITION);
         this._renderFlag |= RenderFlow.FLAG_WORLD_TRANSFORM;
@@ -2106,8 +2201,7 @@ var Node = cc.Class({
             // send event
             if (CC_EDITOR) {
                 this.emit(EventType.POSITION_CHANGED, oldPosition);
-            }
-            else {
+            } else {
                 this.emit(EventType.POSITION_CHANGED);
             }
         }
@@ -2123,9 +2217,8 @@ var Node = cc.Class({
      * @example
      * cc.log("Node Scale: " + node.getScale());
      */
-    getScale () {
-        if (this._scale.x !== this._scale.y)
-            cc.logID(1603);
+    getScale() {
+        if (this._scale.x !== this._scale.y) cc.logID(1603);
         return this._scale.x;
     },
 
@@ -2139,12 +2232,11 @@ var Node = cc.Class({
      * node.setScale(cc.v2(1, 1));
      * node.setScale(1);
      */
-    setScale (x, y) {
-        if (x && typeof x !== 'number') {
+    setScale(x, y) {
+        if (x && typeof x !== "number") {
             y = x.y;
             x = x.x;
-        }
-        else if (y === undefined) {
+        } else if (y === undefined) {
             y = x;
         }
         if (this._scale.x !== x || this._scale.y !== y) {
@@ -2184,7 +2276,7 @@ var Node = cc.Class({
      * @example
      * cc.log("Content Size: " + node.getContentSize());
      */
-    getContentSize () {
+    getContentSize() {
         return cc.size(this._contentSize.width, this._contentSize.height);
     },
 
@@ -2201,11 +2293,14 @@ var Node = cc.Class({
      * node.setContentSize(cc.size(100, 100));
      * node.setContentSize(100, 100);
      */
-    setContentSize (size, height) {
+    setContentSize(size, height) {
         var locContentSize = this._contentSize;
         var clone;
         if (height === undefined) {
-            if ((size.width === locContentSize.width) && (size.height === locContentSize.height))
+            if (
+                size.width === locContentSize.width &&
+                size.height === locContentSize.height
+            )
                 return;
             if (CC_EDITOR) {
                 clone = cc.size(locContentSize.width, locContentSize.height);
@@ -2213,7 +2308,10 @@ var Node = cc.Class({
             locContentSize.width = size.width;
             locContentSize.height = size.height;
         } else {
-            if ((size === locContentSize.width) && (height === locContentSize.height))
+            if (
+                size === locContentSize.width &&
+                height === locContentSize.height
+            )
                 return;
             if (CC_EDITOR) {
                 clone = cc.size(locContentSize.width, locContentSize.height);
@@ -2224,8 +2322,7 @@ var Node = cc.Class({
         if (this._eventMask & SIZE_ON) {
             if (CC_EDITOR) {
                 this.emit(EventType.SIZE_CHANGED, clone);
-            }
-            else {
+            } else {
                 this.emit(EventType.SIZE_CHANGED);
             }
         }
@@ -2251,7 +2348,7 @@ var Node = cc.Class({
      * @example
      * cc.log("Node AnchorPoint: " + node.getAnchorPoint());
      */
-    getAnchorPoint () {
+    getAnchorPoint() {
         return cc.v2(this._anchorPoint);
     },
 
@@ -2277,16 +2374,15 @@ var Node = cc.Class({
      * node.setAnchorPoint(cc.v2(1, 1));
      * node.setAnchorPoint(1, 1);
      */
-    setAnchorPoint (point, y) {
+    setAnchorPoint(point, y) {
         var locAnchorPoint = this._anchorPoint;
         if (y === undefined) {
-            if ((point.x === locAnchorPoint.x) && (point.y === locAnchorPoint.y))
+            if (point.x === locAnchorPoint.x && point.y === locAnchorPoint.y)
                 return;
             locAnchorPoint.x = point.x;
             locAnchorPoint.y = point.y;
         } else {
-            if ((point === locAnchorPoint.x) && (y === locAnchorPoint.y))
-                return;
+            if (point === locAnchorPoint.x && y === locAnchorPoint.y) return;
             locAnchorPoint.x = point;
             locAnchorPoint.y = y;
         }
@@ -2302,7 +2398,7 @@ var Node = cc.Class({
      * @param {Vec3} out
      * @param {Vec3} vec3
      */
-    _invTransformPoint (out, pos) {
+    _invTransformPoint(out, pos) {
         if (this._parent) {
             this._parent._invTransformPoint(out, pos);
         } else {
@@ -2322,7 +2418,7 @@ var Node = cc.Class({
 
         return out;
     },
-    
+
     /*
      * Calculate and return world position.
      * This is not a public API yet, its usage could be updated
@@ -2330,7 +2426,7 @@ var Node = cc.Class({
      * @param {Vec3} out
      * @return {Vec3}
      */
-    getWorldPos (out) {
+    getWorldPos(out) {
         math.vec3.copy(out, this._position);
         let curr = this._parent;
         while (curr) {
@@ -2351,15 +2447,14 @@ var Node = cc.Class({
      * @method setWorldPos
      * @param {Vec3} pos
      */
-    setWorldPos (pos) {
+    setWorldPos(pos) {
         if (CC_EDITOR) {
             var oldPosition = new cc.Vec3(this._position);
         }
         // NOTE: this is faster than invert world matrix and transform the point
         if (this._parent) {
             this._parent._invTransformPoint(this._position, pos);
-        }
-        else {
+        } else {
             math.vec3.copy(this._position, pos);
         }
         this.setLocalDirty(LocalDirtyFlag.POSITION);
@@ -2369,8 +2464,7 @@ var Node = cc.Class({
             // send event
             if (CC_EDITOR) {
                 this.emit(EventType.POSITION_CHANGED, oldPosition);
-            }
-            else {
+            } else {
                 this.emit(EventType.POSITION_CHANGED);
             }
         }
@@ -2383,7 +2477,7 @@ var Node = cc.Class({
      * @param {Quat} out
      * @return {Quat}
      */
-    getWorldRot (out) {
+    getWorldRot(out) {
         math.quat.copy(out, this._quat);
         let curr = this._parent;
         while (curr) {
@@ -2399,19 +2493,18 @@ var Node = cc.Class({
      * @method setWorldRot
      * @param {Quat} rot
      */
-    setWorldRot (quat) {
+    setWorldRot(quat) {
         if (this._parent) {
             this._parent.getWorldRot(this._quat);
             math.quat.conjugate(this._quat, this._quat);
             math.quat.mul(this._quat, this._quat, quat);
-        }
-        else {
+        } else {
             math.quat.copy(this._quat, quat);
         }
         this.setLocalDirty(LocalDirtyFlag.ROTATION);
     },
 
-    getWorldRT (out) {
+    getWorldRT(out) {
         let opos = _vec3_temp;
         let orot = _quat_temp;
         math.vec3.copy(opos, this._position);
@@ -2440,16 +2533,16 @@ var Node = cc.Class({
      * @param {Vec3} pos
      * @param {Vec3} [up] - default is (0,1,0)
      */
-    lookAt (pos, up) {
+    lookAt(pos, up) {
         this.getWorldPos(_vec3_temp);
         math.vec3.sub(_vec3_temp, _vec3_temp, pos); // NOTE: we use -z for view-dir
         math.vec3.normalize(_vec3_temp, _vec3_temp);
         math.quat.fromViewUp(_quat_temp, _vec3_temp, up);
-    
+
         this.setWorldRot(_quat_temp);
     },
 
-    _updateLocalMatrix () {
+    _updateLocalMatrix() {
         let dirtyFlag = this._localMatDirty;
         if (!dirtyFlag) return;
 
@@ -2460,10 +2553,14 @@ var Node = cc.Class({
         if (dirtyFlag & (LocalDirtyFlag.RT | LocalDirtyFlag.SKEW)) {
             let hasRotation = this._rotationX || this._rotationY;
             let hasSkew = this._skewX || this._skewY;
-            let sx = this._scale.x, sy = this._scale.y;
+            let sx = this._scale.x,
+                sy = this._scale.y;
 
             if (hasRotation || hasSkew) {
-                let a = 1, b = 0, c = 0, d = 1;
+                let a = 1,
+                    b = 0,
+                    c = 0,
+                    d = 1;
                 // rotation
                 if (hasRotation) {
                     let rotationRadiansX = this._rotationX * ONE_DEGREE;
@@ -2472,8 +2569,7 @@ var Node = cc.Class({
                     if (this._rotationY === this._rotationX) {
                         a = d;
                         b = -c;
-                    }
-                    else {
+                    } else {
                         let rotationRadiansY = this._rotationY * ONE_DEGREE;
                         a = Math.cos(rotationRadiansY);
                         b = -Math.sin(rotationRadiansY);
@@ -2486,20 +2582,20 @@ var Node = cc.Class({
                 t.m05 = d *= sy;
                 // skew
                 if (hasSkew) {
-                    let a = t.m00, b = t.m01, c = t.m04, d = t.m05;
+                    let a = t.m00,
+                        b = t.m01,
+                        c = t.m04,
+                        d = t.m05;
                     let skx = Math.tan(this._skewX * ONE_DEGREE);
                     let sky = Math.tan(this._skewY * ONE_DEGREE);
-                    if (skx === Infinity)
-                        skx = 99999999;
-                    if (sky === Infinity)
-                        sky = 99999999;
+                    if (skx === Infinity) skx = 99999999;
+                    if (sky === Infinity) sky = 99999999;
                     t.m00 = a + c * sky;
                     t.m01 = b + d * sky;
                     t.m04 = c + a * skx;
                     t.m05 = d + b * skx;
                 }
-            }
-            else {
+            } else {
                 t.m00 = sx;
                 t.m01 = 0;
                 t.m04 = 0;
@@ -2510,26 +2606,36 @@ var Node = cc.Class({
         // position
         t.m12 = this._position.x;
         t.m13 = this._position.y;
-        
+
         this._localMatDirty = 0;
         // Register dirty status of world matrix so that it can be recalculated
         this._worldMatDirty = true;
     },
 
-    _calculWorldMatrix () {
+    _calculWorldMatrix() {
         // Avoid as much function call as possible
         if (this._localMatDirty) {
             this._updateLocalMatrix();
         }
-        
+
         // Assume parent world matrix is correct
         let parent = this._parent;
         if (parent) {
             let pt = parent._worldMatrix;
             let t = this._matrix;
             let wt = this._worldMatrix;
-            let aa=t.m00, ab=t.m01, ac=t.m04, ad=t.m05, atx=t.m12, aty=t.m13;
-            let ba=pt.m00, bb=pt.m01, bc=pt.m04, bd=pt.m05, btx=pt.m12, bty=pt.m13;
+            let aa = t.m00,
+                ab = t.m01,
+                ac = t.m04,
+                ad = t.m05,
+                atx = t.m12,
+                aty = t.m13;
+            let ba = pt.m00,
+                bb = pt.m01,
+                bc = pt.m04,
+                bd = pt.m05,
+                btx = pt.m12,
+                bty = pt.m13;
             if (bb !== 0 || bc !== 0) {
                 wt.m00 = aa * ba + ab * bc;
                 wt.m01 = aa * bb + ab * bd;
@@ -2537,8 +2643,7 @@ var Node = cc.Class({
                 wt.m05 = ac * bb + ad * bd;
                 wt.m12 = ba * atx + bc * aty + btx;
                 wt.m13 = bb * atx + bd * aty + bty;
-            }
-            else {
+            } else {
                 wt.m00 = aa * ba;
                 wt.m01 = ab * bd;
                 wt.m04 = ac * ba;
@@ -2546,14 +2651,13 @@ var Node = cc.Class({
                 wt.m12 = ba * atx + btx;
                 wt.m13 = bd * aty + bty;
             }
-        }
-        else {
+        } else {
             math.mat4.copy(this._worldMatrix, this._matrix);
         }
         this._worldMatDirty = false;
     },
 
-    _updateWorldMatrix () {
+    _updateWorldMatrix() {
         if (this._parent) {
             this._parent._updateWorldMatrix();
         }
@@ -2567,12 +2671,12 @@ var Node = cc.Class({
         }
     },
 
-    setLocalDirty (flag) {
+    setLocalDirty(flag) {
         this._localMatDirty = this._localMatDirty | flag;
         this._worldMatDirty = true;
     },
 
-    setWorldDirty () {
+    setWorldDirty() {
         this._worldMatDirty = true;
     },
 
@@ -2587,11 +2691,11 @@ var Node = cc.Class({
      * let mat4 = cc.mat4();
      * node.getLocalMatrix(mat4);
      */
-    getLocalMatrix (out) {
+    getLocalMatrix(out) {
         this._updateLocalMatrix();
         return math.mat4.copy(out, this._matrix);
     },
-    
+
     /**
      * !#en
      * Get the world transform matrix (4x4)
@@ -2603,7 +2707,7 @@ var Node = cc.Class({
      * let mat4 = cc.mat4();
      * node.getWorldMatrix(mat4);
      */
-    getWorldMatrix (out) {
+    getWorldMatrix(out) {
         this._updateWorldMatrix();
         return math.mat4.copy(out, this._worldMatrix);
     },
@@ -2621,7 +2725,7 @@ var Node = cc.Class({
      * @example
      * var newVec2 = node.convertToNodeSpace(cc.v2(100, 100));
      */
-    convertToNodeSpace (worldPoint) {
+    convertToNodeSpace(worldPoint) {
         this._updateWorldMatrix();
         math.mat4.invert(_mat4_temp, this._worldMatrix);
         let out = new cc.Vec2();
@@ -2642,7 +2746,7 @@ var Node = cc.Class({
      * @example
      * var newVec2 = node.convertToWorldSpace(cc.v2(100, 100));
      */
-    convertToWorldSpace (nodePoint) {
+    convertToWorldSpace(nodePoint) {
         this._updateWorldMatrix();
         let out = new cc.Vec2(
             nodePoint.x - this._anchorPoint.x * this._contentSize.width,
@@ -2662,7 +2766,7 @@ var Node = cc.Class({
      * @example
      * var newVec2 = node.convertToNodeSpaceAR(cc.v2(100, 100));
      */
-    convertToNodeSpaceAR (worldPoint) {
+    convertToNodeSpaceAR(worldPoint) {
         this._updateWorldMatrix();
         math.mat4.invert(_mat4_temp, this._worldMatrix);
         let out = new cc.Vec2();
@@ -2680,13 +2784,13 @@ var Node = cc.Class({
      * @example
      * var newVec2 = node.convertToWorldSpaceAR(cc.v2(100, 100));
      */
-    convertToWorldSpaceAR (nodePoint) {
+    convertToWorldSpaceAR(nodePoint) {
         this._updateWorldMatrix();
         let out = new cc.Vec2();
         return math.vec2.transformMat4(out, nodePoint, this._worldMatrix);
     },
 
-// OLD TRANSFORM ACCESS APIs
+    // OLD TRANSFORM ACCESS APIs
     /**
      * !#en
      * Returns the matrix that transform the node's (local) space coordinates into the parent's space coordinates.<br/>
@@ -2700,12 +2804,12 @@ var Node = cc.Class({
      * let affineTransform = cc.AffineTransform.create();
      * node.getNodeToParentTransform(affineTransform);
      */
-    getNodeToParentTransform (out) {
+    getNodeToParentTransform(out) {
         if (!out) {
             out = AffineTrans.identity();
         }
         this._updateLocalMatrix();
-               
+
         var contentSize = this._contentSize;
         _vec3_temp.x = -this._anchorPoint.x * contentSize.width;
         _vec3_temp.y = -this._anchorPoint.y * contentSize.height;
@@ -2732,7 +2836,7 @@ var Node = cc.Class({
      * let affineTransform = cc.AffineTransform.create();
      * node.getNodeToParentTransformAR(affineTransform);
      */
-    getNodeToParentTransformAR (out) {
+    getNodeToParentTransformAR(out) {
         if (!out) {
             out = AffineTrans.identity();
         }
@@ -2751,12 +2855,12 @@ var Node = cc.Class({
      * let affineTransform = cc.AffineTransform.create();
      * node.getNodeToWorldTransform(affineTransform);
      */
-    getNodeToWorldTransform (out) {
+    getNodeToWorldTransform(out) {
         if (!out) {
             out = AffineTrans.identity();
         }
         this._updateWorldMatrix();
-        
+
         var contentSize = this._contentSize;
         _vec3_temp.x = -this._anchorPoint.x * contentSize.width;
         _vec3_temp.y = -this._anchorPoint.y * contentSize.height;
@@ -2782,7 +2886,7 @@ var Node = cc.Class({
      * let affineTransform = cc.AffineTransform.create();
      * node.getNodeToWorldTransformAR(affineTransform);
      */
-    getNodeToWorldTransformAR (out) {
+    getNodeToWorldTransformAR(out) {
         if (!out) {
             out = AffineTrans.identity();
         }
@@ -2805,7 +2909,7 @@ var Node = cc.Class({
      * let affineTransform = cc.AffineTransform.create();
      * node.getParentToNodeTransform(affineTransform);
      */
-    getParentToNodeTransform (out) {
+    getParentToNodeTransform(out) {
         if (!out) {
             out = AffineTrans.identity();
         }
@@ -2825,7 +2929,7 @@ var Node = cc.Class({
      * let affineTransform = cc.AffineTransform.create();
      * node.getWorldToNodeTransform(affineTransform);
      */
-    getWorldToNodeTransform (out) {
+    getWorldToNodeTransform(out) {
         if (!out) {
             out = AffineTrans.identity();
         }
@@ -2844,7 +2948,7 @@ var Node = cc.Class({
      * @example
      * var newVec2 = node.convertTouchToNodeSpace(touch);
      */
-    convertTouchToNodeSpace (touch) {
+    convertTouchToNodeSpace(touch) {
         return this.convertToNodeSpace(touch.getLocation());
     },
 
@@ -2858,10 +2962,10 @@ var Node = cc.Class({
      * @example
      * var newVec2 = node.convertTouchToNodeSpaceAR(touch);
      */
-    convertTouchToNodeSpaceAR (touch) {
+    convertTouchToNodeSpaceAR(touch) {
         return this.convertToNodeSpaceAR(touch.getLocation());
     },
-    
+
     /**
      * !#en
      * Returns a "local" axis aligned bounding box of the node. <br/>
@@ -2872,15 +2976,16 @@ var Node = cc.Class({
      * @example
      * var boundingBox = node.getBoundingBox();
      */
-    getBoundingBox () {
+    getBoundingBox() {
         this._updateLocalMatrix();
         let width = this._contentSize.width;
         let height = this._contentSize.height;
         let rect = cc.rect(
-            -this._anchorPoint.x * width, 
-            -this._anchorPoint.y * height, 
-            width, 
-            height);
+            -this._anchorPoint.x * width,
+            -this._anchorPoint.y * height,
+            width,
+            height
+        );
         return rect.transformMat4(rect, this._matrix);
     },
 
@@ -2896,46 +3001,48 @@ var Node = cc.Class({
      * @example
      * var newRect = node.getBoundingBoxToWorld();
      */
-    getBoundingBoxToWorld () {
+    getBoundingBoxToWorld() {
         if (this._parent) {
             this._parent._updateWorldMatrix();
             return this._getBoundingBoxTo(this._parent._worldMatrix);
-        }
-        else {
+        } else {
             return this.getBoundingBox();
         }
     },
 
-    _getBoundingBoxTo (parentMat) {
+    _getBoundingBoxTo(parentMat) {
         this._updateLocalMatrix();
         let width = this._contentSize.width;
         let height = this._contentSize.height;
         let rect = cc.rect(
-            -this._anchorPoint.x * width, 
-            -this._anchorPoint.y * height, 
-            width, 
-            height);
+            -this._anchorPoint.x * width,
+            -this._anchorPoint.y * height,
+            width,
+            height
+        );
 
-        var parentMat = math.mat4.mul(this._worldMatrix, parentMat, this._matrix);
+        var parentMat = math.mat4.mul(
+            this._worldMatrix,
+            parentMat,
+            this._matrix
+        );
         rect.transformMat4(rect, parentMat);
 
         //query child's BoundingBox
-        if (!this._children)
-            return rect;
+        if (!this._children) return rect;
 
         var locChildren = this._children;
         for (var i = 0; i < locChildren.length; i++) {
             var child = locChildren[i];
             if (child && child.active) {
                 var childRect = child._getBoundingBoxTo(parentMat);
-                if (childRect)
-                    rect.union(rect, childRect);
+                if (childRect) rect.union(rect, childRect);
             }
         }
         return rect;
     },
 
-    _updateOrderOfArrival () {
+    _updateOrderOfArrival() {
         var arrivalOrder = this._parent ? ++this._parent._childArrivalOrder : 0;
         this._localZOrder = (this._localZOrder & 0xffff0000) | arrivalOrder;
         // redistribute
@@ -2943,7 +3050,8 @@ var Node = cc.Class({
             var siblings = this._parent._children;
 
             siblings.forEach(function (node, index) {
-                node._localZOrder = (node._localZOrder & 0xffff0000) | (index + 1);
+                node._localZOrder =
+                    (node._localZOrder & 0xffff0000) | (index + 1);
             });
 
             this._parent._childArrivalOrder = siblings.length;
@@ -2962,7 +3070,7 @@ var Node = cc.Class({
      * @example
      * node.addChild(newNode, 1, "node");
      */
-    addChild (child, zIndex, name) {
+    addChild(child, zIndex, name) {
         if (CC_DEV && !cc.Node.isNode(child)) {
             return cc.errorID(1634, cc.js.getClassName(child));
         }
@@ -2987,18 +3095,20 @@ var Node = cc.Class({
      * @example
      * node.cleanup();
      */
-    cleanup () {
+    cleanup() {
         // actions
-        ActionManagerExist && cc.director.getActionManager().removeAllActionsFromTarget(this);
+        ActionManagerExist &&
+            cc.director.getActionManager().removeAllActionsFromTarget(this);
         // event
         eventManager.removeListeners(this);
 
         // children
-        var i, len = this._children.length, node;
+        var i,
+            len = this._children.length,
+            node;
         for (i = 0; i < len; ++i) {
             node = this._children[i];
-            if (node)
-                node.cleanup();
+            if (node) node.cleanup();
         }
     },
 
@@ -3009,13 +3119,16 @@ var Node = cc.Class({
      *
      * @method sortAllChildren
      */
-    sortAllChildren () {
+    sortAllChildren() {
         if (this._reorderChildDirty) {
             this._reorderChildDirty = false;
             var _children = this._children;
             if (_children.length > 1) {
                 // insertion sort
-                var len = _children.length, i, j, child;
+                var len = _children.length,
+                    i,
+                    j,
+                    child;
                 for (i = 1; i < len; i++) {
                     child = _children[i];
                     j = i - 1;
@@ -3033,64 +3146,74 @@ var Node = cc.Class({
                 }
                 this.emit(EventType.CHILD_REORDER, this);
             }
-            cc.director.__fastOff(cc.Director.EVENT_AFTER_UPDATE, this.sortAllChildren, this);
+            cc.director.__fastOff(
+                cc.Director.EVENT_AFTER_UPDATE,
+                this.sortAllChildren,
+                this
+            );
         }
     },
 
-    _delaySort () {
+    _delaySort() {
         if (!this._reorderChildDirty) {
             this._reorderChildDirty = true;
-            cc.director.__fastOn(cc.Director.EVENT_AFTER_UPDATE, this.sortAllChildren, this);
+            cc.director.__fastOn(
+                cc.Director.EVENT_AFTER_UPDATE,
+                this.sortAllChildren,
+                this
+            );
         }
     },
 
-    _restoreProperties: CC_EDITOR && function () {
-        /*
-         * TODO: Refine this code after completing undo/redo 2.0.
-         * The node will be destroyed when deleting in the editor,
-         * but it will be reserved and reused for undo.
-        */
-        if (!this._matrix) {
-            this._matrix = mathPools.mat4.get();
-        }
-        if (!this._worldMatrix) {
-            this._worldMatrix = mathPools.mat4.get();
-        }
-
-        this._localMatDirty = LocalDirtyFlag.ALL;
-        this._worldMatDirty = true;
-
-        this._renderFlag |= RenderFlow.FLAG_TRANSFORM;
-        if (this._renderComponent) {
-            if (this._renderComponent.enabled) {
-                this._renderFlag |= RenderFlow.FLAG_COLOR;
-                this._renderComponent.markForUpdateRenderData(true);
+    _restoreProperties:
+        CC_EDITOR &&
+        function () {
+            /*
+             * TODO: Refine this code after completing undo/redo 2.0.
+             * The node will be destroyed when deleting in the editor,
+             * but it will be reserved and reused for undo.
+             */
+            if (!this._matrix) {
+                this._matrix = mathPools.mat4.get();
             }
-            else {
-                this._renderComponent.disableRender();
+            if (!this._worldMatrix) {
+                this._worldMatrix = mathPools.mat4.get();
             }
-        }
 
-        if (this._children.length > 0) {
-            this._renderFlag |= RenderFlow.FLAG_CHILDREN;
-        }
-    },
+            this._localMatDirty = LocalDirtyFlag.ALL;
+            this._worldMatDirty = true;
 
-    onRestore: CC_EDITOR && function () {
-        this._onRestoreBase();
+            this._renderFlag |= RenderFlow.FLAG_TRANSFORM;
+            if (this._renderComponent) {
+                if (this._renderComponent.enabled) {
+                    this._renderFlag |= RenderFlow.FLAG_COLOR;
+                    this._renderComponent.markForUpdateRenderData(true);
+                } else {
+                    this._renderComponent.disableRender();
+                }
+            }
 
-        this._restoreProperties();
+            if (this._children.length > 0) {
+                this._renderFlag |= RenderFlow.FLAG_CHILDREN;
+            }
+        },
 
-        var actionManager = cc.director.getActionManager();
-        if (this._activeInHierarchy) {
-            actionManager && actionManager.resumeTarget(this);
-            eventManager.resumeTarget(this);
-        }
-        else {
-            actionManager && actionManager.pauseTarget(this);
-            eventManager.pauseTarget(this);
-        }
-    }
+    onRestore:
+        CC_EDITOR &&
+        function () {
+            this._onRestoreBase();
+
+            this._restoreProperties();
+
+            var actionManager = cc.director.getActionManager();
+            if (this._activeInHierarchy) {
+                actionManager && actionManager.resumeTarget(this);
+                eventManager.resumeTarget(this);
+            } else {
+                actionManager && actionManager.pauseTarget(this);
+                eventManager.pauseTarget(this);
+            }
+        },
 });
 
 /**
@@ -3230,7 +3353,7 @@ var Node = cc.Class({
  * @return {Boolean}
  */
 
-var SameNameGetSets = ['position', 'scale', 'rotation'];
+var SameNameGetSets = ["position", "scale", "rotation"];
 misc.propertyDefine(Node, SameNameGetSets);
 
 cc.Node = module.exports = Node;
