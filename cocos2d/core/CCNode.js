@@ -615,13 +615,7 @@ var Node = cc.Class({
             },
         },
 
-        setGroup: function () {
-            throw new Error(" you should override this function");
-        },
-
-        getGroup: function () {
-            throw new Error(" you should override this function");
-        },
+       
 
         //properties moved from base node begin
 
