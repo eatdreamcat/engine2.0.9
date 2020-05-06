@@ -356,7 +356,13 @@ var BaseNode = cc.Class({
     getParent() {
         return this._parent;
     },
+    setGroup: function () {
+        
+    },
 
+    getGroup: function () {
+       
+    },
     /**
      * !#en Set parent of the node.
      * !#zh 设置该节点的父节点。
