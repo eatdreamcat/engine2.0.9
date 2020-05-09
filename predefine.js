@@ -90,10 +90,6 @@
  */
 
 /**
- * @property {Boolean} FUNDE_BUG - monitor js running crash, please close it when running in the celerx.
- */
-
-/**
  * @property {Boolean} CC_EDITOR - Running in the editor.
  */
 /**
@@ -154,7 +150,6 @@ if (CC_BUILD) {
     _global.CC_PREVIEW = CC_PREVIEW;
     _global.CC_DEV = CC_DEV;
     _global.CC_DEBUG = CC_DEBUG;
-    _global.FUNDE_BUG = FUNDE_BUG;
     _global.CELER_X = CELER_X;
     _global.CC_JSB = CC_JSB;
     _global.CC_WECHATGAMESUB = CC_WECHATGAMESUB;
@@ -176,7 +171,6 @@ if (CC_BUILD) {
     defineMacro("CC_DEV", true); // (CC_EDITOR && !CC_BUILD) || CC_PREVIEW || CC_TEST
     defineMacro("CC_DEBUG", true); // CC_DEV || Debug Build
     defineMacro("CELER_X", false);
-    defineMacro("FUNDE_BUG", false);
     defineMacro("CC_RUNTIME", "function" === typeof loadRuntime);
     defineMacro("CC_JSB", defined("jsb") && !CC_RUNTIME);
     defineMacro("CC_WECHATGAMESUB", !!(defined("wx") && wx.getSharedCanvas));
