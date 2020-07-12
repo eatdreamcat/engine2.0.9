@@ -31,11 +31,13 @@ const Texture2D = require('../assets/CCTexture2D');
 const loadUuid = require('./uuid-loader');
 const fontLoader = require('./font-loader');
 
-function loadNothing () {
+function loadNothing() {
+    console.log(" load nothing ")
     return null;
 }
 
-function loadJSON (item) {
+function loadJSON(item) {
+
     if (typeof item.content !== 'string') {
         return new Error('JSON Loader: Input item doesn\'t contain string content');
     }
@@ -43,13 +45,12 @@ function loadJSON (item) {
     try {
         var result = JSON.parse(item.content);
         return result;
-    }
-    catch (e) {
+    } catch (e) {
         return new Error('JSON Loader: Parse json [' + item.id + '] failed : ' + e);
     }
 }
 
-function loadImage (item) {
+function loadImage(item) {
     var loadByDeserializedAsset = (item._owner instanceof cc.Asset);
     if (loadByDeserializedAsset) {
         // already has cc.Asset
@@ -59,7 +60,7 @@ function loadImage (item) {
     var image = item.content;
     if (!CC_WECHATGAME && !CC_QQPLAY && cc.sys.platform !== cc.sys.FB_PLAYABLE_ADS && !(image instanceof Image)) {
         return new Error('Image Loader: Input item doesn\'t contain Image content');
-    } 
+    }
 
     // load cc.Texture2D
     var rawUrl = item.rawUrl;
@@ -73,7 +74,7 @@ function loadImage (item) {
 
 // If audio is loaded by url directly, than this loader will wrap it into a new cc.AudioClip object.
 // If audio is loaded by deserialized AudioClip, than this loader will be skipped.
-function loadAudioAsAsset (item, callback) {
+function loadAudioAsAsset(item, callback) {
     var loadByDeserializedAsset = (item._owner instanceof cc.Asset);
     if (loadByDeserializedAsset) {
         // already has cc.Asset
@@ -86,73 +87,71 @@ function loadAudioAsAsset (item, callback) {
     return audioClip;
 }
 
-function loadPlist (item) {
+function loadPlist(item) {
     if (typeof item.content !== 'string') {
         return new Error('Plist Loader: Input item doesn\'t contain string content');
     }
     var result = plistParser.parse(item.content);
     if (result) {
         return result;
-    }
-    else {
+    } else {
         return new Error('Plist Loader: Parse [' + item.id + '] failed');
     }
 }
 
-function loadBinary (item) {
+function loadBinary(item) {
     // Invoke custom handle
     if (item.load) {
         return item.load(item.content);
-    }
-    else {
+    } else {
         return null;
     }
 }
 
 var defaultMap = {
     // Images
-    'png' : loadImage,
-    'jpg' : loadImage,
-    'bmp' : loadImage,
-    'jpeg' : loadImage,
-    'gif' : loadImage,
-    'ico' : loadImage,
-    'tiff' : loadImage,
-    'webp' : loadImage,
-    'image' : loadImage,
+    'png': loadImage,
+    'jpg': loadImage,
+    'bmp': loadImage,
+    'jpeg': loadImage,
+    'gif': loadImage,
+    'ico': loadImage,
+    'tiff': loadImage,
+    'webp': loadImage,
+    'image': loadImage,
 
     // Audio
-    'mp3' : loadAudioAsAsset,
-    'ogg' : loadAudioAsAsset,
-    'wav' : loadAudioAsAsset,
-    'm4a' : loadAudioAsAsset,
+    'mp3': loadAudioAsAsset,
+    'ogg': loadAudioAsAsset,
+    'wav': loadAudioAsAsset,
+    'm4a': loadAudioAsAsset,
 
     // json
-    'json' : loadJSON,
-    'ExportJson' : loadJSON,
+    'json': loadJSON,
+    'ExportJson': loadJSON,
 
     // plist
-    'plist' : loadPlist,
+    'plist': loadPlist,
 
     // asset
-    'uuid' : loadUuid,
-    'prefab' : loadUuid,
-    'fire' : loadUuid,
-    'scene' : loadUuid,
+    'uuid': loadUuid,
+    'prefab': loadUuid,
+    'fire': loadUuid,
+    'scene': loadUuid,
 
     // binary
-    'binary' : loadBinary,
-    'dbbin' : loadBinary,
+    'binary': loadBinary,
+    'dbbin': loadBinary,
 
     // Font
-    'font' : fontLoader.loadFont,
-    'eot' : fontLoader.loadFont,
-    'ttf' : fontLoader.loadFont,
-    'woff' : fontLoader.loadFont,
-    'svg' : fontLoader.loadFont,
-    'ttc' : fontLoader.loadFont,
+    'font': fontLoader.loadFont,
+    'eot': fontLoader.loadFont,
+    'ttf': fontLoader.loadFont,
+    'woff': fontLoader.loadFont,
+    'svg': fontLoader.loadFont,
+    'ttc': fontLoader.loadFont,
 
-    'default' : loadNothing
+    'default': loadNothing
 };
 
 var ID = 'Loader';

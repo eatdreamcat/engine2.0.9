@@ -26,6 +26,7 @@
 var urlAppendTimestamp = require('./utils').urlAppendTimestamp;
 
 module.exports = function (item, callback) {
+
     var url = item.url;
     url = urlAppendTimestamp(url);
 
@@ -37,20 +38,30 @@ module.exports = function (item, callback) {
         if (xhr.readyState === 4) {
             if (xhr.status === 200 || xhr.status === 0) {
                 callback(null, xhr.responseText);
+            } else {
+                callback({
+                    status: xhr.status,
+                    errorMessage: errInfo + '(wrong status)'
+                });
             }
-            else {
-                callback({status:xhr.status, errorMessage:errInfo + '(wrong status)'});
-            }
-        }
-        else {
-            callback({status:xhr.status, errorMessage:errInfo + '(wrong readyState)'});
+        } else {
+            callback({
+                status: xhr.status,
+                errorMessage: errInfo + '(wrong readyState)'
+            });
         }
     };
-    xhr.onerror = function(){
-        callback({status:xhr.status, errorMessage:errInfo + '(error)'});
+    xhr.onerror = function () {
+        callback({
+            status: xhr.status,
+            errorMessage: errInfo + '(error)'
+        });
     };
-    xhr.ontimeout = function(){
-        callback({status:xhr.status, errorMessage:errInfo + '(time out)'});
+    xhr.ontimeout = function () {
+        callback({
+            status: xhr.status,
+            errorMessage: errInfo + '(time out)'
+        });
     };
     xhr.send(null);
 };
