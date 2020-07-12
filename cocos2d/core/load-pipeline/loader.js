@@ -32,7 +32,7 @@ const loadUuid = require('./uuid-loader');
 const fontLoader = require('./font-loader');
 
 function loadNothing() {
-    console.log(" load nothing ")
+
     return null;
 }
 
