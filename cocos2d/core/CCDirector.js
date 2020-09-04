@@ -105,7 +105,7 @@ const Scheduler = require("./CCScheduler");
  * @class Director
  * @extends EventTarget
  */
-cc.Director = function() {
+cc.Director = function () {
     EventTarget.call(this);
 
     this.invalid = false;
@@ -135,7 +135,7 @@ cc.Director = function() {
     this._actionManager = null;
 
     var self = this;
-    game.on(game.EVENT_SHOW, function() {
+    game.on(game.EVENT_SHOW, function () {
         self._lastUpdate = performance.now();
     });
 
@@ -144,7 +144,7 @@ cc.Director = function() {
 
 cc.Director.prototype = {
     constructor: cc.Director,
-    init: function() {
+    init: function () {
         this._totalFrames = 0;
         this._lastUpdate = performance.now();
         this._paused = false;
@@ -171,7 +171,7 @@ cc.Director.prototype = {
      * Manage all init process shared between the web engine and jsb engine.
      * All platform independent init process should be occupied here.
      */
-    sharedInit: function() {
+    sharedInit: function () {
         this._compScheduler = new ComponentScheduler();
         this._nodeActivator = new NodeActivator();
 
@@ -227,7 +227,7 @@ cc.Director.prototype = {
     /**
      * calculates delta time since last time it was called
      */
-    calculateDeltaTime: function() {
+    calculateDeltaTime: function () {
         var now = performance.now();
 
         this._deltaTime = (now - this._lastUpdate) / 1000;
@@ -247,7 +247,7 @@ cc.Director.prototype = {
      * @return {Vec2}
      * @deprecated since v2.0
      */
-    convertToGL: function(uiPoint) {
+    convertToGL: function (uiPoint) {
         var container = game.container;
         var view = cc.view;
         var box = container.getBoundingClientRect();
@@ -255,9 +255,9 @@ cc.Director.prototype = {
         var top = box.top + window.pageYOffset - container.clientTop;
         var x = view._devicePixelRatio * (uiPoint.x - left);
         var y = view._devicePixelRatio * (top + box.height - uiPoint.y);
-        return view._isRotated
-            ? cc.v2(view._viewportRect.width - y, x)
-            : cc.v2(x, y);
+        return view._isRotated ?
+            cc.v2(view._viewportRect.width - y, x) :
+            cc.v2(x, y);
     },
 
     /**
@@ -271,7 +271,7 @@ cc.Director.prototype = {
      * @return {Vec2}
      * @deprecated since v2.0
      */
-    convertToUI: function(glPoint) {
+    convertToUI: function (glPoint) {
         var container = game.container;
         var view = cc.view;
         var box = container.getBoundingClientRect();
@@ -295,7 +295,7 @@ cc.Director.prototype = {
      * End the life of director in the next frame
      * @method end
      */
-    end: function() {
+    end: function () {
         this._purgeDirectorInNextLoop = true;
     },
 
@@ -308,7 +308,7 @@ cc.Director.prototype = {
      * @return {Size}
      * @deprecated since v2.0
      */
-    getWinSize: function() {
+    getWinSize: function () {
         return cc.size(cc.winSize);
     },
 
@@ -325,7 +325,7 @@ cc.Director.prototype = {
      * @return {Size}
      * @deprecated since v2.0
      */
-    getWinSizeInPixels: function() {
+    getWinSizeInPixels: function () {
         return cc.size(cc.winSize);
     },
 
@@ -338,7 +338,7 @@ cc.Director.prototype = {
      * 如果想要更彻底得暂停游戏，包含渲染，音频和事件，请使用 {{#crossLink "Game.pause"}}cc.game.pause{{/crossLink}}。
      * @method pause
      */
-    pause: function() {
+    pause: function () {
         if (this._paused) return;
         this._paused = true;
     },
@@ -347,14 +347,14 @@ cc.Director.prototype = {
      * Removes cached all cocos2d cached data.
      * @deprecated since v2.0
      */
-    purgeCachedData: function() {
+    purgeCachedData: function () {
         cc.loader.releaseAll();
     },
 
     /**
      * Purge the cc.director itself, including unschedule all schedule, remove all event listeners, clean up and exit the running scene, stops all animations, clear cached data.
      */
-    purgeDirector: function() {
+    purgeDirector: function () {
         //cleanup scheduler
         this._scheduler.unscheduleAll();
         this._compScheduler.unscheduleAll();
@@ -382,7 +382,7 @@ cc.Director.prototype = {
     /**
      * Reset the cc.director, can be used to restart the director after purge
      */
-    reset: function() {
+    reset: function () {
         this.purgeDirector();
 
         if (eventManager) eventManager.setEnabled(true);
@@ -436,7 +436,7 @@ cc.Director.prototype = {
      * @param {Function} [onBeforeLoadScene] - The function invoked at the scene before loading.
      * @param {Function} [onLaunched] - The function invoked at the scene after launch.
      */
-    runSceneImmediate: function(scene, onBeforeLoadScene, onLaunched) {
+    runSceneImmediate: function (scene, onBeforeLoadScene, onLaunched) {
         cc.assertID(scene instanceof cc.Scene, 1216);
 
         CC_BUILD && CC_DEBUG && console.time("InitScene");
@@ -445,7 +445,7 @@ cc.Director.prototype = {
 
         // Re-attach or replace persist nodes
         CC_BUILD && CC_DEBUG && console.time("AttachPersist");
-        var persistNodeList = Object.keys(game._persistRootNodes).map(function(
+        var persistNodeList = Object.keys(game._persistRootNodes).map(function (
             x
         ) {
             return game._persistRootNodes[x];
@@ -523,7 +523,7 @@ cc.Director.prototype = {
      * @param {Function} [onLaunched] - The function invoked at the scene after launch.
      * @private
      */
-    runScene: function(scene, onBeforeLoadScene, onLaunched) {
+    runScene: function (scene, onBeforeLoadScene, onLaunched) {
         cc.assertID(scene, 1205);
         cc.assertID(scene instanceof cc.Scene, 1216);
 
@@ -533,7 +533,7 @@ cc.Director.prototype = {
         // Delay run / replace scene to the end of the frame
         this.once(
             cc.Director.EVENT_AFTER_UPDATE,
-            function() {
+            function () {
                 this.runSceneImmediate(scene, onBeforeLoadScene, onLaunched);
             },
             this
@@ -542,7 +542,7 @@ cc.Director.prototype = {
 
     //  @Scene loading section
 
-    _getSceneUuid: function(key) {
+    _getSceneUuid: function (key) {
         var scenes = game._sceneInfos;
         if (typeof key === "string") {
             if (!key.endsWith(".fire")) {
@@ -579,7 +579,7 @@ cc.Director.prototype = {
      * @param {Function} [onLaunched] - callback, will be called after scene launched.
      * @return {Boolean} if error, return false
      */
-    loadScene: function(sceneName, onLaunched, _onUnloaded) {
+    loadScene: function (sceneName, onLaunched, _onUnloaded) {
         if (this._loadingScene) {
             cc.errorID(1208, sceneName, this._loadingScene);
             return false;
@@ -617,7 +617,7 @@ cc.Director.prototype = {
      * @param {Error} onLoaded.error - null or the error object.
      * @param {cc.SceneAsset} onLoaded.asset - The scene asset itself.
      */
-    preloadScene: function(sceneName, onProgress, onLoaded) {
+    preloadScene: function (sceneName, onProgress, onLoaded) {
         if (onLoaded === undefined) {
             onLoaded = onProgress;
             onProgress = null;
@@ -626,10 +626,12 @@ cc.Director.prototype = {
         var info = this._getSceneUuid(sceneName);
         if (info) {
             this.emit(cc.Director.EVENT_BEFORE_SCENE_LOADING, sceneName);
-            cc.loader.load(
-                { uuid: info.uuid, type: "uuid" },
+            cc.loader.load({
+                    uuid: info.uuid,
+                    type: "uuid"
+                },
                 onProgress,
-                function(error, asset) {
+                function (error, asset) {
                     if (error) {
                         cc.errorID(1210, sceneName, error.message);
                     }
@@ -658,7 +660,7 @@ cc.Director.prototype = {
      *                                   only take effect in the Editor.
      * @private
      */
-    _loadSceneByUuid: function(uuid, onLaunched, onUnloaded, dontRunScene) {
+    _loadSceneByUuid: function (uuid, onLaunched, onUnloaded, dontRunScene) {
         if (CC_EDITOR) {
             if (typeof onLaunched === "boolean") {
                 dontRunScene = onLaunched;
@@ -671,7 +673,7 @@ cc.Director.prototype = {
         }
         //cc.AssetLibrary.unloadAsset(uuid);     // force reload
         console.time("LoadScene " + uuid);
-        cc.AssetLibrary.loadAsset(uuid, function(error, sceneAsset) {
+        cc.AssetLibrary.loadAsset(uuid, function (error, sceneAsset) {
             console.timeEnd("LoadScene " + uuid);
             var self = cc.director;
             self._loadingScene = "";
@@ -716,7 +718,7 @@ cc.Director.prototype = {
      * !#zh 恢复暂停场景的游戏逻辑，如果当前场景没有暂停将没任何事情发生。
      * @method resume
      */
-    resume: function() {
+    resume: function () {
         if (!this._paused) {
             return;
         }
@@ -739,7 +741,7 @@ cc.Director.prototype = {
      * @param {Boolean} on
      * @deprecated since v2.0
      */
-    setDepthTest: function(value) {
+    setDepthTest: function (value) {
         if (!cc.Camera.main) {
             return;
         }
@@ -757,7 +759,7 @@ cc.Director.prototype = {
      * @param {Color} clearColor
      * @deprecated since v2.0
      */
-    setClearColor: function(clearColor) {
+    setClearColor: function (clearColor) {
         if (!cc.Camera.main) {
             return;
         }
@@ -772,7 +774,7 @@ cc.Director.prototype = {
      * @return {Scene}
      * @deprecated since v2.0
      */
-    getRunningScene: function() {
+    getRunningScene: function () {
         return this._scene;
     },
 
@@ -785,7 +787,7 @@ cc.Director.prototype = {
      *  // This will help you to get the Canvas node in scene
      *  cc.director.getScene().getChildByName('Canvas');
      */
-    getScene: function() {
+    getScene: function () {
         return this._scene;
     },
 
@@ -796,7 +798,7 @@ cc.Director.prototype = {
      * @deprecated since v2.0
      * @return {Number}
      */
-    getAnimationInterval: function() {
+    getAnimationInterval: function () {
         return 1000 / game.getFrameRate();
     },
 
@@ -807,7 +809,7 @@ cc.Director.prototype = {
      * @deprecated since v2.0
      * @param {Number} value - The animation interval desired.
      */
-    setAnimationInterval: function(value) {
+    setAnimationInterval: function (value) {
         game.setFrameRate(Math.round(1000 / value));
     },
 
@@ -817,7 +819,7 @@ cc.Director.prototype = {
      * @method getDeltaTime
      * @return {Number}
      */
-    getDeltaTime: function() {
+    getDeltaTime: function () {
         return this._deltaTime;
     },
 
@@ -827,7 +829,7 @@ cc.Director.prototype = {
      * @method getTotalFrames
      * @return {Number}
      */
-    getTotalFrames: function() {
+    getTotalFrames: function () {
         return this._totalFrames;
     },
 
@@ -837,7 +839,7 @@ cc.Director.prototype = {
      * @method isPaused
      * @return {Boolean}
      */
-    isPaused: function() {
+    isPaused: function () {
         return this._paused;
     },
 
@@ -847,7 +849,7 @@ cc.Director.prototype = {
      * @method getScheduler
      * @return {Scheduler}
      */
-    getScheduler: function() {
+    getScheduler: function () {
         return this._scheduler;
     },
 
@@ -857,7 +859,7 @@ cc.Director.prototype = {
      * @method setScheduler
      * @param {Scheduler} scheduler
      */
-    setScheduler: function(scheduler) {
+    setScheduler: function (scheduler) {
         if (this._scheduler !== scheduler) {
             this._scheduler = scheduler;
         }
@@ -869,7 +871,7 @@ cc.Director.prototype = {
      * @method getActionManager
      * @return {ActionManager}
      */
-    getActionManager: function() {
+    getActionManager: function () {
         return this._actionManager;
     },
     /**
@@ -878,7 +880,7 @@ cc.Director.prototype = {
      * @method setActionManager
      * @param {ActionManager} actionManager
      */
-    setActionManager: function(actionManager) {
+    setActionManager: function (actionManager) {
         if (this._actionManager !== actionManager) {
             if (this._actionManager) {
                 this._scheduler.unscheduleUpdate(this._actionManager);
@@ -898,7 +900,7 @@ cc.Director.prototype = {
      * @method getAnimationManager
      * @return {AnimationManager}
      */
-    getAnimationManager: function() {
+    getAnimationManager: function () {
         return this._animationManager;
     },
 
@@ -908,7 +910,7 @@ cc.Director.prototype = {
      * @method getCollisionManager
      * @return {CollisionManager}
      */
-    getCollisionManager: function() {
+    getCollisionManager: function () {
         return this._collisionManager;
     },
 
@@ -918,7 +920,7 @@ cc.Director.prototype = {
      * @method getPhysicsManager
      * @return {PhysicsManager}
      */
-    getPhysicsManager: function() {
+    getPhysicsManager: function () {
         return this._physicsManager;
     },
 
@@ -926,7 +928,7 @@ cc.Director.prototype = {
     /*
      * Starts Animation
      */
-    startAnimation: function() {
+    startAnimation: function () {
         this.invalid = false;
         this._lastUpdate = performance.now();
     },
@@ -934,84 +936,84 @@ cc.Director.prototype = {
     /*
      * Stops animation
      */
-    stopAnimation: function() {
+    stopAnimation: function () {
         this.invalid = true;
     },
 
     /*
      * Run main loop of director
      */
-    mainLoop: CC_EDITOR
-        ? function(deltaTime, updateAnimate) {
-              this._deltaTime = deltaTime;
+    mainLoop: CC_EDITOR ?
+        function (deltaTime, updateAnimate) {
+            this._deltaTime = deltaTime;
 
-              // Update
-              if (!this._paused) {
-                  this.emit(cc.Director.EVENT_BEFORE_UPDATE);
+            // Update
+            if (!this._paused) {
+                this.emit(cc.Director.EVENT_BEFORE_UPDATE);
 
-                  this._compScheduler.startPhase();
-                  this._compScheduler.updatePhase(deltaTime);
+                this._compScheduler.startPhase();
+                this._compScheduler.updatePhase(deltaTime);
 
-                  if (updateAnimate) {
-                      this._scheduler.update(deltaTime);
-                  }
+                if (updateAnimate) {
+                    this._scheduler.update(deltaTime);
+                }
 
-                  this._compScheduler.lateUpdatePhase(deltaTime);
+                this._compScheduler.lateUpdatePhase(deltaTime);
 
-                  this.emit(cc.Director.EVENT_AFTER_UPDATE);
-              }
+                this.emit(cc.Director.EVENT_AFTER_UPDATE);
+            }
 
-              // Render
-              this.emit(cc.Director.EVENT_BEFORE_DRAW);
-              renderer.render(this._scene);
+            // Render
+            this.emit(cc.Director.EVENT_BEFORE_DRAW);
+            renderer.render(this._scene);
 
-              // After draw
-              this.emit(cc.Director.EVENT_AFTER_DRAW);
+            // After draw
+            this.emit(cc.Director.EVENT_AFTER_DRAW);
 
-              this._totalFrames++;
-          }
-        : function() {
-              if (this._purgeDirectorInNextLoop) {
-                  this._purgeDirectorInNextLoop = false;
-                  this.purgeDirector();
-              } else if (!this.invalid) {
-                  // calculate "global" dt
-                  this.calculateDeltaTime();
+            this._totalFrames++;
+        } :
+        function () {
+            if (this._purgeDirectorInNextLoop) {
+                this._purgeDirectorInNextLoop = false;
+                this.purgeDirector();
+            } else if (!this.invalid) {
+                // calculate "global" dt
+                this.calculateDeltaTime();
 
-                  // Update
-                  if (!this._paused) {
-                      this.emit(cc.Director.EVENT_BEFORE_UPDATE);
-                      // Call start for new added components
-                      this._compScheduler.startPhase();
-                      // Update for components
-                      this._compScheduler.updatePhase(this._deltaTime);
-                      // Engine update with scheduler
-                      this._scheduler.update(this._deltaTime);
-                      // Late update for components
-                      this._compScheduler.lateUpdatePhase(this._deltaTime);
-                      // User can use this event to do things after update
-                      this.emit(cc.Director.EVENT_AFTER_UPDATE);
-                      // Destroy entities that have been removed recently
-                      Obj._deferredDestroy();
-                  }
+                // Update
+                if (!this._paused) {
+                    this.emit(cc.Director.EVENT_BEFORE_UPDATE);
+                    // Call start for new added components
+                    this._compScheduler.startPhase();
+                    // Update for components
+                    this._compScheduler.updatePhase(this._deltaTime);
+                    // Engine update with scheduler
+                    this._scheduler.update(this._deltaTime);
+                    // Late update for components
+                    this._compScheduler.lateUpdatePhase(this._deltaTime);
+                    // User can use this event to do things after update
+                    this.emit(cc.Director.EVENT_AFTER_UPDATE);
+                    // Destroy entities that have been removed recently
+                    Obj._deferredDestroy();
+                }
 
-                  // Render
-                  this.emit(cc.Director.EVENT_BEFORE_DRAW);
-                  renderer.render(this._scene);
+                // Render
+                this.emit(cc.Director.EVENT_BEFORE_DRAW);
+                renderer.render(this._scene);
 
-                  // After draw
-                  this.emit(cc.Director.EVENT_AFTER_DRAW);
+                // After draw
+                this.emit(cc.Director.EVENT_AFTER_DRAW);
 
-                  eventManager.frameUpdateListeners();
-                  this._totalFrames++;
-              }
-          },
+                eventManager.frameUpdateListeners();
+                this._totalFrames++;
+            }
+        },
 
-    __fastOn: function(type, callback, target) {
+    __fastOn: function (type, callback, target) {
         this.add(type, callback, target);
     },
 
-    __fastOff: function(type, callback, target) {
+    __fastOff: function (type, callback, target) {
         this.remove(type, callback, target);
     }
 };

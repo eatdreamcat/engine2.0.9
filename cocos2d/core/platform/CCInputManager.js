@@ -40,26 +40,26 @@ let inputManager = {
 
     _isRegisterEvent: false,
 
-    _preTouchPoint: cc.v2(0,0),
-    _prevMousePoint: cc.v2(0,0),
+    _preTouchPoint: cc.v2(0, 0),
+    _prevMousePoint: cc.v2(0, 0),
 
     _preTouchPool: [],
     _preTouchPoolPointer: 0,
 
     _touches: [],
-    _touchesIntegerDict:{},
+    _touchesIntegerDict: {},
 
     _indexBitsUsed: 0,
     _maxTouches: 8,
 
     _accelEnabled: false,
-    _accelInterval: 1/5,
+    _accelInterval: 1 / 5,
     _accelMinus: 1,
     _accelCurTime: 0,
     _acceleration: null,
     _accelDeviceEvent: null,
 
-    _getUnUsedIndex () {
+    _getUnUsedIndex() {
         let temp = this._indexBitsUsed;
         let now = cc.sys.now();
 
@@ -67,8 +67,7 @@ let inputManager = {
             if (!(temp & 0x00000001)) {
                 this._indexBitsUsed |= (1 << i);
                 return i;
-            }
-            else {
+            } else {
                 let touch = this._touches[i];
                 if (now - touch._lastModified > TOUCH_TIMEOUT) {
                     this._removeUsedIndexBit(i);
@@ -83,7 +82,7 @@ let inputManager = {
         return -1;
     },
 
-    _removeUsedIndexBit (index) {
+    _removeUsedIndexBit(index) {
         if (index < 0 || index >= this._maxTouches)
             return;
 
@@ -98,11 +97,12 @@ let inputManager = {
      * @method handleTouchesBegin
      * @param {Array} touches
      */
-    handleTouchesBegin (touches) {
+    handleTouchesBegin(touches) {
         let selTouch, index, curTouch, touchID,
-            handleTouches = [], locTouchIntDict = this._touchesIntegerDict,
+            handleTouches = [],
+            locTouchIntDict = this._touchesIntegerDict,
             now = sys.now();
-        for (let i = 0, len = touches.length; i < len; i ++) {
+        for (let i = 0, len = touches.length; i < len; i++) {
             selTouch = touches[i];
             touchID = selTouch.getID();
             index = locTouchIntDict[touchID];
@@ -133,9 +133,10 @@ let inputManager = {
      * @method handleTouchesMove
      * @param {Array} touches
      */
-    handleTouchesMove (touches) {
+    handleTouchesMove(touches) {
         let selTouch, index, touchID,
-            handleTouches = [], locTouches = this._touches,
+            handleTouches = [],
+            locTouches = this._touches,
             now = sys.now();
         for (let i = 0, len = touches.length; i < len; i++) {
             selTouch = touches[i];
@@ -165,7 +166,7 @@ let inputManager = {
      * @method handleTouchesEnd
      * @param {Array} touches
      */
-    handleTouchesEnd (touches) {
+    handleTouchesEnd(touches) {
         let handleTouches = this.getSetOfTouchesEndOrCancel(touches);
         if (handleTouches.length > 0) {
             this._glView._convertTouchesWithScale(handleTouches);
@@ -180,7 +181,7 @@ let inputManager = {
      * @method handleTouchesCancel
      * @param {Array} touches
      */
-    handleTouchesCancel (touches) {
+    handleTouchesCancel(touches) {
         let handleTouches = this.getSetOfTouchesEndOrCancel(touches);
         if (handleTouches.length > 0) {
             this._glView._convertTouchesWithScale(handleTouches);
@@ -196,15 +197,17 @@ let inputManager = {
      * @param {Array} touches
      * @returns {Array}
      */
-    getSetOfTouchesEndOrCancel (touches) {
-        let selTouch, index, touchID, handleTouches = [], locTouches = this._touches, locTouchesIntDict = this._touchesIntegerDict;
-        for (let i = 0, len = touches.length; i< len; i ++) {
+    getSetOfTouchesEndOrCancel(touches) {
+        let selTouch, index, touchID, handleTouches = [],
+            locTouches = this._touches,
+            locTouchesIntDict = this._touchesIntegerDict;
+        for (let i = 0, len = touches.length; i < len; i++) {
             selTouch = touches[i];
             touchID = selTouch.getID();
             index = locTouchesIntDict[touchID];
 
             if (index == null) {
-                continue;  //cc.log("if the index doesn't exist, it is an error");
+                continue; //cc.log("if the index doesn't exist, it is an error");
             }
             if (locTouches[index]) {
                 locTouches[index]._setPoint(selTouch._point);
@@ -222,7 +225,7 @@ let inputManager = {
      * @param {HTMLElement} element
      * @return {Object}
      */
-    getHTMLElementPosition (element) {
+    getHTMLElementPosition(element) {
         if (CC_WECHATGAME) {
             return {
                 left: 0,
@@ -243,8 +246,7 @@ let inputManager = {
                 width: box.width,
                 height: box.height
             };
-        }
-        else {
+        } else {
             if (element instanceof HTMLCanvasElement) {
                 return {
                     left: leftOffset,
@@ -252,8 +254,7 @@ let inputManager = {
                     width: element.width,
                     height: element.height
                 };
-            }
-            else {
+            } else {
                 return {
                     left: leftOffset,
                     top: topOffset,
@@ -269,7 +270,7 @@ let inputManager = {
      * @param {Touch} touch
      * @return {Touch}
      */
-    getPreTouch (touch) {
+    getPreTouch(touch) {
         let preTouch = null;
         let locPreTouchPool = this._preTouchPool;
         let id = touch.getID();
@@ -288,7 +289,7 @@ let inputManager = {
      * @method setPreTouch
      * @param {Touch} touch
      */
-    setPreTouch (touch) {
+    setPreTouch(touch) {
         let find = false;
         let locPreTouchPool = this._preTouchPool;
         let id = touch.getID();
@@ -316,10 +317,10 @@ let inputManager = {
      * @param {Vec2} pos
      * @return {Touch}
      */
-    getTouchByXY (tx, ty, pos) {
+    getTouchByXY(tx, ty, pos) {
         let locPreTouch = this._preTouchPoint;
         let location = this._glView.convertToLocationInView(tx, ty, pos);
-        let touch = new cc.Touch(location.x,  location.y, 0);
+        let touch = new cc.Touch(location.x, location.y, 0);
         touch._setPrevPoint(locPreTouch.x, locPreTouch.y);
         locPreTouch.x = location.x;
         locPreTouch.y = location.y;
@@ -333,7 +334,7 @@ let inputManager = {
      * @param {Number} eventType
      * @returns {Event.EventMouse}
      */
-    getMouseEvent (location, pos, eventType) {
+    getMouseEvent(location, pos, eventType) {
         let locPreMouse = this._prevMousePoint;
         let mouseEvent = new cc.Event.EventMouse(eventType);
         mouseEvent._setPrevCursor(locPreMouse.x, locPreMouse.y);
@@ -350,19 +351,24 @@ let inputManager = {
      * @param {Vec2} pos
      * @return {Vec2}
      */
-    getPointByEvent (event, pos) {
-        if (event.pageX != null)  //not avalable in <= IE8
-            return {x: event.pageX, y: event.pageY};
+    getPointByEvent(event, pos) {
+        if (event.pageX != null) //not avalable in <= IE8
+            return {
+                x: event.pageX,
+                y: event.pageY
+            };
 
         if (CC_WECHATGAME) {
             pos.left = 0;
             pos.top = 0;
-        }
-        else {
+        } else {
             pos.left -= document.body.scrollLeft;
             pos.top -= document.body.scrollTop;
         }
-        return {x: event.clientX, y: event.clientY};
+        return {
+            x: event.clientX,
+            y: event.clientY
+        };
     },
 
     /**
@@ -371,8 +377,9 @@ let inputManager = {
      * @param {Vec2} pos
      * @returns {Array}
      */
-    getTouchesByEvent (event, pos) {
-        let touchArr = [], locView = this._glView;
+    getTouchesByEvent(event, pos) {
+        let touchArr = [],
+            locView = this._glView;
         let touch_event, touch, preLocation;
         let locPreTouch = this._preTouchPoint;
 
@@ -407,8 +414,8 @@ let inputManager = {
      * @method registerSystemEvent
      * @param {HTMLElement} element
      */
-    registerSystemEvent (element) {
-        if(this._isRegisterEvent) return;
+    registerSystemEvent(element) {
+        if (this._isRegisterEvent) return;
 
         this._glView = cc.view;
         let selfPointer = this;
@@ -439,15 +446,15 @@ let inputManager = {
                 window.addEventListener('mouseup', function (event) {
                     if (!selfPointer._mousePressed)
                         return;
-                    
+
                     selfPointer._mousePressed = false;
 
                     let pos = selfPointer.getHTMLElementPosition(element);
                     let location = selfPointer.getPointByEvent(event, pos);
-                    if (!cc.rect(pos.left, pos.top, pos.width, pos.height).contains(location)){
+                    if (!cc.rect(pos.left, pos.top, pos.width, pos.height).contains(location)) {
                         selfPointer.handleTouchesEnd([selfPointer.getTouchByXY(location.x, location.y, pos)]);
 
-                        let mouseEvent = selfPointer.getMouseEvent(location,pos,cc.Event.EventMouse.UP);
+                        let mouseEvent = selfPointer.getMouseEvent(location, pos, cc.Event.EventMouse.UP);
                         mouseEvent.setButton(event.button);
                         eventManager.dispatchEvent(mouseEvent);
                     }
@@ -504,14 +511,14 @@ let inputManager = {
 
         if (window.navigator.msPointerEnabled) {
             let _pointerEventsMap = {
-                "MSPointerDown"     : selfPointer.handleTouchesBegin,
-                "MSPointerMove"     : selfPointer.handleTouchesMove,
-                "MSPointerUp"       : selfPointer.handleTouchesEnd,
-                "MSPointerCancel"   : selfPointer.handleTouchesCancel
+                "MSPointerDown": selfPointer.handleTouchesBegin,
+                "MSPointerMove": selfPointer.handleTouchesMove,
+                "MSPointerUp": selfPointer.handleTouchesEnd,
+                "MSPointerCancel": selfPointer.handleTouchesCancel
             };
             for (let eventName in _pointerEventsMap) {
                 let touchEvent = _pointerEventsMap[eventName];
-                element.addEventListener(eventName, function (event){
+                element.addEventListener(eventName, function (event) {
                     let pos = selfPointer.getHTMLElementPosition(element);
                     pos.left -= document.documentElement.scrollLeft;
                     pos.top -= document.documentElement.scrollTop;
@@ -550,9 +557,9 @@ let inputManager = {
                     onTouchEnd: _touchEventsMap.touchend,
                     onTouchCancel: _touchEventsMap.touchcancel,
                 };
-                registerTouchEvent = function(eventName) {
+                registerTouchEvent = function (eventName) {
                     let handler = _touchEventsMap[eventName];
-                    wx[eventName](function(event) {
+                    wx[eventName](function (event) {
                         if (!event.changedTouches) return;
                         let pos = selfPointer.getHTMLElementPosition(element);
                         let body = document.body;
@@ -561,11 +568,10 @@ let inputManager = {
                         handler(selfPointer.getTouchesByEvent(event, pos));
                     });
                 };
-            }
-            else {
-                registerTouchEvent = function(eventName) {
+            } else {
+                registerTouchEvent = function (eventName) {
                     let handler = _touchEventsMap[eventName];
-                    element.addEventListener(eventName, (function(event) {
+                    element.addEventListener(eventName, (function (event) {
                         if (!event.changedTouches) return;
                         let pos = selfPointer.getHTMLElementPosition(element);
                         let body = document.body;
@@ -573,7 +579,9 @@ let inputManager = {
                         pos.top -= body.scrollTop || 0;
                         handler(selfPointer.getTouchesByEvent(event, pos));
                         event.stopPropagation();
-                        event.preventDefault();
+                        if (event.cancelable) {
+                            event.preventDefault();
+                        }
                     }), false);
                 };
             }
@@ -590,15 +598,15 @@ let inputManager = {
         this._isRegisterEvent = true;
     },
 
-    _registerKeyboardEvent () {},
+    _registerKeyboardEvent() {},
 
-    _registerAccelerometerEvent () {},
+    _registerAccelerometerEvent() {},
 
     /**
      * @method update
      * @param {Number} dt
      */
-    update (dt) {
+    update(dt) {
         if (this._accelCurTime > this._accelInterval) {
             this._accelCurTime -= this._accelInterval;
             eventManager.dispatchEvent(new cc.Event.EventAcceleration(this._acceleration));
