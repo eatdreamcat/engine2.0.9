@@ -1,6 +1,6 @@
 const renderEngine = require('../render-engine');
 const gfx = renderEngine.gfx;
-const isIOS14Device = cc.sys.os === cc.sys.OS_IOS && cc.sys.isBrowser && cc.sys.isMobile && /iPhone OS 14/.test(window.navigator.userAgent);
+
 let MeshBuffer = cc.Class({
     name: 'cc.MeshBuffer',
     ctor(batcher, vertexFormat) {
@@ -228,18 +228,7 @@ let MeshBuffer = cc.Class({
     }
 });
 
-if (isIOS14Device) {
-    MeshBuffer.prototype.checkAndSwitchBuffer = function (vertexCount) {
-        if (this.vertexOffset + vertexCount > 65535) {
-            this.uploadData();
-            this._batcher._flush();
-        }
-    };
-    MeshBuffer.prototype.forwardIndiceStartToOffset = function () {
-        this.uploadData();
-        this.switchBuffer();
-    }
-}
+
 
 
 cc.MeshBuffer = module.exports = MeshBuffer;
